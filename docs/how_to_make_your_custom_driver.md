@@ -320,13 +320,13 @@ static const struct drm_display_mode w280bf036i_mode = {
     .type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
 };
 ```
-and the last but not least, we setting panel's lane number at `w280bf036i_desc` struct:  
+and the last but not least, we setting panel's lane number in `w280bf036i_desc` struct:  
 ```c
 static const struct w280bf036i_panel_desc w280bf036i_desc = {
     .mode = &w280bf036i_mode,
     .lanes = 1,
     .flags = MIPI_DSI_MODE_VIDEO,
-    .format = MIPI_DSI_FMT_RGB888,
+    .format = MIPI_DSI_FMT_RGB888, // Add here more modes according to panel's datasheet when needed.
 };
 ```
 `Makefile`:
