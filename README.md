@@ -30,7 +30,8 @@ sudo ./lcd.sh remove
 and reboot.  
 if you wants to get adapters，take a look at [`adapters`](https://github.com/CNflysky/RPI_DSI_Drivers/tree/main/adapters)directory. 
 # how to make your own customized driver
-[doc](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/docs/how_to_make_your_custom_driver.md)  
+[Here](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/docs/how_to_make_your_custom_driver.md)  
+*Translated from my Chinese blog,may not 100% accurate.*
 
 # Supported Panel
 | Part Number | Size | Resolution | Interface | Connector | Note |
