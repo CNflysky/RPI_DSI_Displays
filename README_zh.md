@@ -27,8 +27,8 @@ sudo chmod 755 lcd.sh && sudo ./lcd.sh install
 ```bash
 sudo ./lcd.sh remove
 ```
-如果您需要自己制作转接板，请查看本仓库下的`adapters`文件夹。
-重启后即可卸载驱动。
+重启后即可卸载驱动。  
+如果您需要自己制作转接板，请查看本仓库下的[`adapters`](https://github.com/CNflysky/RPI_DSI_Drivers/tree/main/adapters)文件夹。  
 # 如何移植自己的驱动
 您可以参考我写的这篇文章：[CSDN链接](https://blog.csdn.net/CNflysky/article/details/123119666)  
 
