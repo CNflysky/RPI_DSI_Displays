@@ -23,7 +23,6 @@
 				status        = "okay";
 				reg           = <0>;
 				reset-gpios   = <&gpio 47 1>;   // Dummy GPIO , Unused
-				rotation      = <90>;
 				port {
 					panel_dsi_port: endpoint {
 						remote-endpoint = <&dsi_out_port>;
