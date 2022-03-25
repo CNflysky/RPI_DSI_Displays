@@ -22,7 +22,7 @@ then simply run:
 ```bash
 sudo chmod 755 lcd.sh && sudo ./lcd.sh install
 ```
-and reboot .
+and reboot.  
 if you need to remove drivers，return back to driver directory，run:  
 ```bash
 sudo ./lcd.sh remove
