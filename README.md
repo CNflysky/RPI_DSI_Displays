@@ -6,8 +6,8 @@ Various DSI display drivers for the Raspberry PI.
 compared from SPI/DPI panels，DSI panels have taken these advantages:
 - High refresh rates(~60fps)
 - Easy to wire
-- low occupancy to gpios
-- low power consumption
+- Low occupancy to gpios
+- Low power consumption
 
 # How to use
 Clone this repository to your Raspberry PI：  
