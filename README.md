@@ -37,3 +37,11 @@ if you wants to get adapters，take a look at [`adapters`](https://github.com/CN
 | Part Number | Size | Resolution | Interface | Connector | Note |
 | ---- | ---- | --- | --- | --- | --- |
 |W280BF036I| 2.8 Inch| VGA(480x640) | MIPI 1 Lane | 24p Connector ||
+
+# Gallery
+## W280BF036I
+![neofetch](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_neofetch.jpg)
+![htop](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_htop.jpg)
+![vim](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_vim.jpg)
+![cmatrix](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_cmatrix.gif)
+![testufo](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_testufo.jpg)
