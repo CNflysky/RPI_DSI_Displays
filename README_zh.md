@@ -36,3 +36,11 @@ sudo ./lcd.sh remove
 | 料号 | 尺寸 | 分辨率 | 接口 | 连接器 | 备注 |
 | ---- | ---- | --- | --- | --- | --- |
 |W280BF036I| 2.8 Inch| VGA(480x640) | MIPI 1 Lane | 24p 连接器 ||
+
+# 展示
+## W280BF036I
+![neofetch](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_neofetch.jpg)
+![htop](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_htop.jpg)
+![vim](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_vim.jpg)
+![cmatrix](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_cmatrix.gif)
+![testufo](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_testufo.jpg)
