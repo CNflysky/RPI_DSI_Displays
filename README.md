@@ -3,7 +3,7 @@ Various DSI display drivers for the Raspberry PI.
 [Simplified Chinese](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/README_zh.md)
 # Why DSI?
 
-compared from legacy SPI/DPI panels，DSI panels have taken these advantages:
+compared from SPI/DPI panels，DSI panels have taken these advantages:
 - High refresh rates(~60fps)
 - Easy to wire
 - low occupancy to gpios
