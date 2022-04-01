@@ -1,6 +1,10 @@
 # RPI_DSI_Drivers
 为树莓派设计的几种DSI屏幕的驱动程序。
 
+# Bug
+在将内核升级到5.15版本后，驱动无法工作。
+请先不要升级到5.15版本直到我修复bug。
+
 # 为什么使用DSI?
 
 和传统的SPI/DPI屏幕相比，DSI屏幕具有以下优点:
@@ -18,7 +22,12 @@ git clone https://github.com/CNflysky/RPI_DSI_Drivers
 ```bash
 cd RPI_DSI_Drivers/w280bf036i
 ```
-随后您只需要简单地执行:  
+将第44行注释掉:
+```bash
+  #install_tools
+```
+然后安装你需要的内核头文件。
+安装完毕后，运行：
 ```bash
 sudo chmod 755 lcd.sh && sudo ./lcd.sh install
 ```
