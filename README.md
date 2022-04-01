@@ -1,6 +1,11 @@
 # RPI_DSI_Drivers
 Various DSI display drivers for the Raspberry PI.  
 [Simplified Chinese](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/README_zh.md)
+
+# Bug
+After bumping my kernel from 5.10 to 5.15, these drivers are not working anymore.   
+Please stay to 5.10.y versions until I figure out what's going on.  
+
 # Why DSI?
 
 compared from SPI/DPI panels，DSI panels have taken these advantages:
@@ -18,7 +23,12 @@ then find the driver corresponding to your panel：
 ```bash
 cd RPI_DSI_Drivers/w280bf036i
 ```
-then simply run:  
+commit out line 44:
+```bash
+  #install_tools
+```
+Then install the kernel headers that you need.  
+When you finished,run:
 ```bash
 sudo chmod 755 lcd.sh && sudo ./lcd.sh install
 ```
