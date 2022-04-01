@@ -185,7 +185,7 @@ static const struct drm_panel_funcs w280bf036i_funcs = {
 };
 
 static const struct drm_display_mode w280bf036i_mode = {
-    .clock = 25000,
+    .clock = 20500,
 
     .hdisplay = 480,
     .hsync_start = 480 + /* HFP */ 10,
