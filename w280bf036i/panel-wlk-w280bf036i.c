@@ -206,7 +206,8 @@ static const struct drm_display_mode w280bf036i_mode = {
 static const struct w280bf036i_panel_desc w280bf036i_desc = {
     .mode = &w280bf036i_mode,
     .lanes = 1,
-    .flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST,
+    .flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST |
+             MIPI_DSI_MODE_LPM | MIPI_DSI_CLOCK_NON_CONTINOUS,
     .format = MIPI_DSI_FMT_RGB888,
 };
 
