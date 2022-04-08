@@ -47,7 +47,7 @@ if you wants to get adapters，take a look at [`adapters`](https://github.com/CN
 | Part Number | Size | Resolution | Interface | Connector | TP | Note |
 | ---- | ---- | --- | --- | --- | --- | -- |
 |W280BF036I| 2.8 Inch| VGA(480x640) | MIPI 1 Lane | 24p Connector | None | |
-|TDA-FWVGA0500G50089| 5.0 Inch | FWVGA(480x854) | MIPI 2 Lane | 33p Connector | FT6306 | Working in progress |
+|W500IE020| 5.0 Inch | FWVGA(480x854) | MIPI 2 Lane | 30p Connector | None | Working in progress |
 
 # Gallery
 ## W280BF036I
