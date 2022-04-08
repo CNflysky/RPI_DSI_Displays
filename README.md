@@ -2,10 +2,6 @@
 Various DSI display drivers for the Raspberry PI.  
 [Simplified Chinese](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/README_zh.md)
 
-# Bug
-After bumping my kernel from 5.10 to 5.15, these drivers are not working anymore.   
-Please stay to 5.10.y versions until I figure out what's going on.  
-
 # Why DSI?
 
 compared from SPI/DPI panels，DSI panels have taken these advantages:
@@ -19,25 +15,10 @@ Clone this repository to your Raspberry PI：
 ```bash
 git clone https://github.com/CNflysky/RPI_DSI_Drivers
 ```
-then find the driver corresponding to your panel：  
+Then run:
 ```bash
-cd RPI_DSI_Drivers/w280bf036i
-```
-commit out line 44:
-```bash
-  #install_tools
-```
-Then install the kernel headers that you need.  
-When you finished,run:
-```bash
-sudo chmod 755 lcd.sh && sudo ./lcd.sh install
-```
-and reboot.  
-if you need to remove drivers，return back to driver directory，run:  
-```bash
-sudo ./lcd.sh remove
-```
-and reboot.  
+sudo chmod 755 lcd.sh && sudo ./lcd.sh
+```  
 if you wants to get adapters，take a look at [`adapters`](https://github.com/CNflysky/RPI_DSI_Drivers/tree/main/adapters)directory. 
 # Make your own customized driver
 [Here](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/docs/how_to_make_your_custom_driver.md)  
@@ -55,4 +36,4 @@ if you wants to get adapters，take a look at [`adapters`](https://github.com/CN
 ![htop](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_htop.jpg)
 ![vim](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_vim.jpg)
 ![cmatrix](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_cmatrix.gif)
-![testufo](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_testufo.jpg)
+![testufo](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_ufotest.jpg)
