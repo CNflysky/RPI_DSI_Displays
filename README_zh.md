@@ -1,10 +1,6 @@
 # RPI_DSI_Drivers
 为树莓派设计的几种DSI屏幕的驱动程序。
 
-# Bug
-在将内核升级到5.15版本后，驱动无法工作。  
-请先不要升级到5.15版本直到bug修复。
-
 # 为什么使用DSI?
 
 和传统的SPI/DPI屏幕相比，DSI屏幕具有以下优点:
@@ -18,25 +14,10 @@
 ```bash
 git clone https://github.com/CNflysky/RPI_DSI_Drivers
 ```
-然后您需要根据您的屏幕型号找到需要的驱动：  
+然后，运行:
 ```bash
-cd RPI_DSI_Drivers/w280bf036i
+sudo chmod 755 lcd.sh && sudo ./lcd.sh
 ```
-将第44行注释掉:
-```bash
-  #install_tools
-```
-然后安装你需要的内核头文件。
-安装完毕后，运行：
-```bash
-sudo chmod 755 lcd.sh && sudo ./lcd.sh install
-```
-安装完成后重启即可。  
-如果需要卸载驱动，请回到上述文件夹，执行:  
-```bash
-sudo ./lcd.sh remove
-```
-重启后即可卸载驱动。  
 如果您需要自己制作转接板，请查看本仓库下的[`adapters`](https://github.com/CNflysky/RPI_DSI_Drivers/tree/main/adapters)文件夹。  
 # 如何移植自己的驱动
 您可以参考我写的这篇文章：[CSDN链接](https://blog.csdn.net/CNflysky/article/details/123119666)  
@@ -45,7 +26,7 @@ sudo ./lcd.sh remove
 | 料号 | 尺寸 | 分辨率 | 接口 | 连接器 | 触摸 | 备注 |
 | ---- | ---- | --- | --- | --- | --- | --- |
 |W280BF036I| 2.8 Inch| VGA(480x640) | MIPI 1 Lane | 24p 连接器 | 无 | |
-|TDA-FWVGA0500G50089| 5.0 Inch | FWVGA(480x854) | MIPI 2 Lane | 33p 连接器 | FT6306 | 正在适配 |
+|W500IE020| 5.0 Inch | FWVGA(480x854) | MIPI 2 Lane | 30p 连接器 | 无 | 正在适配 |
 
 # 展示
 ## W280BF036I
@@ -53,4 +34,4 @@ sudo ./lcd.sh remove
 ![htop](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_htop.jpg)
 ![vim](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_vim.jpg)
 ![cmatrix](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_cmatrix.gif)
-![testufo](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_testufo.jpg)
+![testufo](https://github.com/CNflysky/RPI_DSI_Drivers/raw/main/images/w280bf036i/w280bf036i_ufotest.jpg)
