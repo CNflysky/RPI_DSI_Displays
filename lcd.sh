@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 MODULE_ROOT_PATH=/lib/modules/`uname -r`
 MODULE_INSTALL_PATH='kernel/drivers/gpu/drm/panel'
 DRIVER_SOURCE_DIR=src
@@ -10,7 +11,7 @@ function install_tools(){
     then
         return
     else 
-        apt install -y make raspberrypi-kernel-headers 2>&1 >/dev/null
+        apt install -y make raspberrypi-kernel-headers >/dev/null 2>&1
     fi
 }
 
@@ -44,39 +45,26 @@ function remove_module(){
 }
 
 function setup(){
-    {
-        install_tools
-        echo 40
-        cd src
-        make 2>&1 > /dev/null
-        echo 60
-        install_module $FILE_NAME.ko
-        echo 70
-        cp $DT_NAME.dts $DT_NAME-1.dts
-        sed -i "s/panel-compatible/$1/g" $DT_NAME-1.dts
-        dtc -@ -I dts -O dtb -o $DT_NAME.dtbo $DT_NAME-1.dts
-        cp $DT_NAME.dtbo /boot/overlays
-        echo 80
-        set_config ignore_lcd 1
-        set_config dtoverlay $DT_NAME
-        echo 90
-        make clean
-        rm $DT_NAME-1.dts
-        echo 100
-    } | whiptail --gauge "Please wait while installing..." 6 60 0
+    install_tools
+    cd src
+    make
+    install_module $FILE_NAME.ko
+    cp $DT_NAME.dts $DT_NAME-1.dts
+    sed -i "s/panel-compatible/$1/g" $DT_NAME-1.dts
+    dtc -@ -I dts -O dtb -o $DT_NAME.dtbo $DT_NAME-1.dts
+    cp $DT_NAME.dtbo /boot/overlays
+    set_config ignore_lcd 1
+    set_config dtoverlay $DT_NAME
+    make clean
+    rm $DT_NAME-1.dts
     ask_reboot
 }
 
 function remove(){
-    {
-        remove_module $FILE_NAME.ko
-        echo 40
-        rm -rf /boot/overlays/$DT_NAME.dtbo
-        echo 60
-        remove_config ignore_lcd
-        remove_config $DT_NAME
-        echo 100
-    } | whiptail --gauge "Please wait while removing..." 6 60 0
+    remove_module $FILE_NAME.ko
+    rm -rf /boot/overlays/$DT_NAME.dtbo
+    remove_config ignore_lcd
+    remove_config $DT_NAME
     ask_reboot
 }
 
