@@ -11,7 +11,7 @@ compared from SPI/DPI panels，DSI panels have taken these advantages:
 - Low power consumption
 
 # Limitation
-Beasuse of Raspberry Pi Boards(3b,4b) have only 2 lanes on dsi1 so the max resolution have been limited by 720p.  
+Beasuse of Raspberry Pi Boards(3b,4b) have only wired out 2 lanes on dsi1 so the max resolution have been limited by 720p.  
 If you want drive panel more than 2 lanes,you may need to consider the compute module.  
 
 # How to use
