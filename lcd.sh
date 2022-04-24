@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 MODULE_ROOT_PATH=/lib/modules/`uname -r`
 MODULE_INSTALL_PATH='kernel/drivers/gpu/drm/panel'
 DRIVER_SOURCE_DIR=src
@@ -11,7 +10,7 @@ function install_tools(){
     then
         return
     else 
-        apt install -y make raspberrypi-kernel-headers >/dev/null 2>&1
+        apt install -y make raspberrypi-kernel-headers
     fi
 }
 
@@ -45,6 +44,7 @@ function remove_module(){
 }
 
 function setup(){
+    set -e
     install_tools
     cd src
     make
@@ -61,6 +61,7 @@ function setup(){
 }
 
 function remove(){
+    set -e
     remove_module $FILE_NAME.ko
     rm -rf /boot/overlays/$DT_NAME.dtbo
     remove_config ignore_lcd
