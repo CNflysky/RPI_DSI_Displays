@@ -5,12 +5,12 @@
 
 和传统的SPI/DPI屏幕相比，DSI屏幕具有以下优点:
 - 刷新速率高(~60帧)
-- 易于连接
+- 接线简单
 - 占用GPIO数量较少
 - 功耗较低
 
 # 局限
-由于树莓派主板(3b,4b)的DSI1接口只引出了2 lane，所以最大分辨率被限制在了720p左右。  
+由于树莓派的电路设计原因，目前主板上的DSI接口最大支持2 lane(最大分辨率720p)。  
 如果想要驱动大于2 lane的屏幕，您可能得考虑使用计算模块(compute module)。  
 
 
@@ -24,7 +24,9 @@ git clone https://github.com/CNflysky/RPI_DSI_Drivers
 sudo chmod 755 lcd.sh && sudo ./lcd.sh
 ```
 如果您需要自己制作转接板，请查看本仓库下的[`adapters`](https://github.com/CNflysky/RPI_DSI_Drivers/tree/main/adapters)文件夹。  
-# 如何移植自己的驱动
+您也可以在OSHWHub上查看转接板:[链接](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)(目前只有中文版)  
+
+# 如何制作自己的驱动
 您可以参考我写的这篇文章：[CSDN链接](https://blog.csdn.net/CNflysky/article/details/123119666)  
 
 # 已经适配(或者正在适配)的屏幕
