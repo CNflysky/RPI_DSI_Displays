@@ -1,58 +1,20 @@
-// compile: dtc -@ -I dts -O dtb -o vc4-kms-dsi-panel-dsi.dtbo vc4-kms-dsi-panel-dsi.dts
-
 /dts-v1/;
 /plugin/;
 / {
 	compatible = "brcm,bcm2835";  
 
-	fragment@0{
-		target = <&i2c0mux>;
-		__overlay__ {
-			status = "okay";
-		};
-	};
-
-	fragment@1{
-		target = <&i2c0if>;
-		__overlay__ {
-			status = "okay";
-		};
-	};
-
-	fragment@2 {
-		target = <&i2c_csi_dsi>;
-		__overlay__ {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			status = "okay";
-
-			pca: pca@41 {
-				compatible = "nxp,pca9536";
-				reg = <0x41>;
-				gpio-controller;
-				#gpio-cells = <2>;
-				status = "okay";
-				gpio-line-names = 
-					"0_Unused",
-					"1_LCD_BL",
-					"2_Unused",
-					"3_LCD_RST";
-			};
-		};
-	};
-
-	fragment@3 {
+	fragment@0 {
 		target-path="/";
 		__overlay__ {
 			panel_backlight: panel_backlight {
 				compatible = "gpio-backlight";
-				gpios = <&pca 1 0>;
+				gpios = <&gpio 45 0>;
 				default-on;
 			};
 		};
 	};
 	
-	fragment@4 {
+	fragment@1 {
 		target = <&dsi1>;
 		__overlay__{
 			status = "okay";
@@ -68,7 +30,8 @@
 				compatible    = "panel-compatible";
 				status        = "okay";
 				reg           = <0>;
-				reset-gpios   = <&pca 2 0>; // fix me
+				// reset-gpios   = <&gpio 44 0>;
+				reset-gpios   = <&gpio 46 0>; // fix me
 				backlight = <&panel_backlight>;
 				port {
 					panel_dsi_port: endpoint {
