@@ -3,7 +3,6 @@ MODULE_ROOT_PATH=/lib/modules/`uname -r`
 MODULE_INSTALL_PATH='kernel/drivers/gpu/drm/panel'
 DRIVER_SOURCE_DIR=src
 FILE_NAME='panel-raspberrypi-dsi'
-DT_NAME='vc4-kms-dsi-raspberrypi'
 
 function install_tools(){
     if apt list --installed 2>/dev/null | grep -q raspberrypi-kernel-headers && apt list --installed 2>/dev/null | grep -q make
@@ -102,6 +101,19 @@ function main(){
     elif [ $ret -eq 1 ]
     then
         action=remove
+    else
+        whiptail --title "LCD Driver Utility" --msgbox "User Canceled." 10 60
+        exit 1
+    fi
+
+    whiptail --title "LCD Driver Utility" --yes-button "Yes" --no-button "No"  --yesno "Is there a PCA9536(or compatible) chip on your board?" 10 60 3>&1 1>&2 2>&3
+    ret=$?
+    if [ $ret -eq 0 ]
+    then
+        DT_NAME='vc4-kms-dsi-raspberrypi-pca'
+    elif [ $ret -eq 1 ]
+    then
+        DT_NAME='vc4-kms-dsi-raspberrypi'
     else
         whiptail --title "LCD Driver Utility" --msgbox "User Canceled." 10 60
         exit 1
