@@ -46,30 +46,35 @@ function setup(){
     set -e
     install_tools
     cd src
-    make
+    if [ -n $3 ]
+    then
+        make $3
+    else
+        make
+    fi
     install_module $FILE_NAME.ko
-    cp $DT_NAME.dts $DT_NAME-1.dts
-    sed -i "s/panel-compatible/$1/g" $DT_NAME-1.dts
-    dtc -@ -I dts -O dtb -o $DT_NAME.dtbo $DT_NAME-1.dts
-    cp $DT_NAME.dtbo /boot/overlays
+    cp $2.dts $2-1.dts
+    sed -i "s/panel-compatible/$1/g" $2-1.dts
+    dtc -@ -I dts -O dtb -o $2.dtbo $2-1.dts
+    cp $2.dtbo /boot/overlays
     set_config ignore_lcd 1
-    set_config dtoverlay $DT_NAME
+    set_config dtoverlay $2
     make clean
-    rm $DT_NAME-1.dts
+    rm $2-1.dts
     ask_reboot
 }
 
 function remove(){
     set -e
     remove_module $FILE_NAME.ko
-    rm -rf /boot/overlays/$DT_NAME.dtbo
+    rm /boot/overlays/$1.dtbo
     remove_config ignore_lcd
-    remove_config $DT_NAME
+    remove_config $1
     ask_reboot
 }
 
 function ask_reboot(){
-    whiptail --title "LCD Driver Utility" --yes-button "Yes" --no-button "No"  --yesno "Would you like to reboot now?" 10 60 3>&1 1>&2 2>&3
+    whiptail --title "LCD Driver Utility" --yesno "Would you like to reboot now?" 10 60 3>&1 1>&2 2>&3
     ret=$?
     if [ $ret -eq 0 ]
     then
@@ -106,39 +111,35 @@ function main(){
         exit 1
     fi
 
-    whiptail --title "LCD Driver Utility" --yes-button "Yes" --no-button "No"  --yesno "Is there a PCA9536(or compatible) chip on your board?" 10 60 3>&1 1>&2 2>&3
-    ret=$?
-    if [ $ret -eq 0 ]
-    then
-        DT_NAME='vc4-kms-dsi-raspberrypi-pca'
-    elif [ $ret -eq 1 ]
-    then
-        DT_NAME='vc4-kms-dsi-raspberrypi'
-    else
-        whiptail --title "LCD Driver Utility" --msgbox "User Canceled." 10 60
-        exit 1
-    fi
-
     scr=`whiptail --title "LCD Driver Utility" --menu "Which driver would you like to $action?" 15 60 4 \
-    "1" "W280BF036i" \
-    "2" "W500IE020" \
+    "1" "W280BF036i(PCA9536)" \
+    "2" "W280BF036i" \
+    "3" "W500IE020" \
     3>&1 1>&2 2>&3`
 
     case $scr in 
     1)
         if [ $action == "install" ]
         then
-            setup wlk,w280bf036i
+            setup wlk,w280bf036i vc4-kms-dsi-raspberrypi-pca CFLAGS_MODULE+=-DHAS_PCA9536 
         else
-            remove
+            remove vc4-kms-dsi-raspberrypi-pca
         fi
     ;;
     2)
         if [ $action == "install" ]
         then
-            setup wlk,w500ie020
+            setup wlk,w280bf036i vc4-kms-dsi-raspberrypi
         else
-            remove
+            remove vc4-kms-dsi-raspberrypi
+        fi
+    ;;
+    3)
+        if [ $action == "install" ]
+        then
+            setup wlk,w500ie020 vc4-kms-dsi-raspberrypi
+        else
+            remove vc4-kms-dsi-raspberrypi
         fi
     ;;
     *)

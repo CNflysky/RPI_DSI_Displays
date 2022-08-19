@@ -353,7 +353,10 @@ static struct mipi_dsi_driver dsi_panel_driver = {
 };
 module_mipi_dsi_driver(dsi_panel_driver);
 
+#ifdef HAS_PCA9536
 MODULE_SOFTDEP("pre: gpio_pca953x");
+#endif
+
 MODULE_AUTHOR("CNflysky@qq.com");
 MODULE_DESCRIPTION("Multiple Raspberry Pi DSI Panels Driver");
 MODULE_LICENSE("GPL");
