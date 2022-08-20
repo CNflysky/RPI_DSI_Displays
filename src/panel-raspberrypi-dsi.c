@@ -242,17 +242,17 @@ static const struct drm_panel_funcs dsi_panel_funcs = {
 };
 
 static const struct drm_display_mode w280bf036i_mode = {
-    .clock = 25000,
+    .clock = 22572,
 
     .hdisplay = 480,
-    .hsync_start = 480 + /* HFP */ 10,
-    .hsync_end = 480 + 10 + /* HSync */ 4,
-    .htotal = 480 + 10 + 4 + /* HBP */ 20,
+    .hsync_start = 480 + /* HFP */ 30,
+    .hsync_end = 480 + 30 + /* HSync */ 10,
+    .htotal = 480 + 30 + 10 + /* HBP */ 30,
 
     .vdisplay = 640,
-    .vsync_start = 640 + /* VFP */ 8,
-    .vsync_end = 640 + 8 + /* VSync */ 4,
-    .vtotal = 640 + 8 + 4 + /* VBP */ 14,
+    .vsync_start = 640 + /* VFP */ 20,
+    .vsync_end = 640 + 20 + /* VSync */ 4,
+    .vtotal = 640 + 20 + 4 + /* VBP */ 20,
 
     .width_mm = 43,
     .height_mm = 57,
