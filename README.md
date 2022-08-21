@@ -1,18 +1,19 @@
 # RPI_DSI_Drivers
-Various DSI display drivers for the Raspberry PI.  
+Various DSI display drivers for Raspberry Pi.  
+*Note: This repository is still under development. Feel free to open issues if you have any questions or suggestions.*  
 [Simplified Chinese](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/README_zh.md)
 
 # Why DSI?
 
-compared from SPI/DPI panels，DSI panels have taken these advantages:
+Compared from SPI/DPI panels，DSI panels has taken these advantages:
 - High refresh rates(~60fps)
 - Easy to wire
 - Low occupancy to gpios
 - Low power consumption
 
 # Limitation
-Due to Raspberry Pi boards' circuit design, currently on-board DSI connector only support 2 lanes(max resolution 720p).
-If you want drive panel more than 2 lanes,you may need to consider the compute module.  
+Due to Raspberry Pi boards' circuit design, currently the on-board DSI connector only support 2 DSI lanes(max resolution 720p).
+If you want drive panel has more than 2 lanes,you may need to consider the *compute module*.  
 
 # How to use
 Clone this repository on your Raspberry Pi：  
