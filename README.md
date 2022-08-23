@@ -1,7 +1,7 @@
 # RPI_DSI_Drivers
 Various DSI display drivers for Raspberry Pi.  
 *Note: This repository is still under development. Feel free to open issues if you have any questions or suggestions.*  
-[Simplified Chinese(简体中文版)](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/README_zh.md)
+[Simplified Chinese(简体中文)](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/README_zh.md)
 
 # Why DSI?
 
