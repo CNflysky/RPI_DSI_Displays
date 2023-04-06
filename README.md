@@ -21,7 +21,7 @@ In `Raspberry Pi OS` releases after `2022-1-28`, `DRM` is default enabled.
 Old releases of RPiOS may not support `DRM`,so use latest RPiOS is recommended.  
 
 # How to use
-*Note: if there was no `raspberrypi-kernel-headers` package installed, then use of this script will install it automatically,and **upgrade your kernel to latest version**. if you don't want to upgrade,you must download the kernel headers file that matching your kernel version and build this driver by yourself.*  
+*Note: if there was no `raspberrypi-kernel-headers` package installed, then use of this script will install it automatically and **upgrade your kernel to latest version**. if you don't want to upgrade,you must download the kernel headers that matching your kernel version and build this driver by yourself.*  
 Clone this repository on your Raspberry Pi：  
 ```bash
 git clone https://github.com/CNflysky/RPI_DSI_Drivers
