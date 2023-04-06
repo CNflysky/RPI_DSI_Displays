@@ -9,7 +9,8 @@ function install_tools(){
     then
         return
     else 
-        apt install -y make raspberrypi-kernel-headers
+        apt update
+        apt install -y make raspberrypi-kernel raspberrypi-kernel-headers
     fi
 }
 
