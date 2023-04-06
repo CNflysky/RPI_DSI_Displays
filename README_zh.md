@@ -18,6 +18,7 @@
 首先克隆本仓库到您的树莓派中：  
 ```bash
 git clone https://github.com/CNflysky/RPI_DSI_Drivers
+cd RPI_DSI_Drivers
 ```
 然后，运行:
 ```bash

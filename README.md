@@ -19,10 +19,11 @@ If you want drive panel has more than 2 lanes,you may need to consider the *comp
 Clone this repository on your Raspberry Pi：  
 ```bash
 git clone https://github.com/CNflysky/RPI_DSI_Drivers
+cd RPI_DSI_Drivers/
 ```
 Then run:
 ```bash
-sudo chmod 755 lcd.sh && sudo ./lcd.sh
+sudo ./lcd.sh
 ```  
 if you wants to get adapters，take a look at [`adapters`](https://github.com/CNflysky/RPI_DSI_Drivers/tree/main/adapters)directory.   
 You can view it on the OSHWHub:[Link](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)(Chinese version only)  

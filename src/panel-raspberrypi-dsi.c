@@ -1,6 +1,6 @@
 /*
 ** Copyright (C) 2022 CNflysky. All rights reserved.
-** Kernel DRM driver for Multiple Panels in DSI interface.
+** Kernel DRM driver for some MIPI DSI displays designed for RPi.
 */
 
 #include <drm/drm_mipi_dsi.h>
@@ -356,5 +356,5 @@ MODULE_SOFTDEP("pre: gpio_pca953x");
 #endif
 
 MODULE_AUTHOR("CNflysky@qq.com");
-MODULE_DESCRIPTION("Multiple Raspberry Pi DSI Panels Driver");
+MODULE_DESCRIPTION("Raspberry Pi DSI Displays Driver");
 MODULE_LICENSE("GPL");
