@@ -15,7 +15,7 @@ Compared from SPI/DPI panels，DSI panels has taken these advantages:
 ## Circuit 
 Due to Raspberry Pi boards' circuit design, currently the on-board DSI connector only support 2 DSI lanes(max resolution 720p).
 If you want drive panel has more than 2 lanes,you may need to consider the *compute module*.  
-##
+## RPiOS
 You must enable `DRM` first in order to use this driver.  
 In `Raspberry Pi OS` releases after `2022-1-28`, `DRM` is default enabled.  
 Old releases of RPiOS may not support `DRM`,so use latest RPiOS is recommended.  
