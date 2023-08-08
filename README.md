@@ -1,27 +1,27 @@
 # RPI_DSI_Drivers
-Various DSI display drivers for Raspberry Pi.  
+Kernel DRM Driver for RPI DSI Display.
 *Note: This repository is still under development. Feel free to open issues if you have any questions or suggestions.*  
-[Simplified Chinese(简体中文)](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/README_zh.md)
+[Simplified Chinese(简体中文)](./README_zh.md)
 
 # Why DSI?
 
 Compared from SPI/DPI panels，DSI panels has taken these advantages:
-- High refresh rates(~60fps)
+- High refresh rate(~60fps)
 - Easy to wire
-- Low occupancy to gpios
+- Consume less gpio resources
 - Low power consumption
 
 # Limitation
 ## Circuit 
-Due to Raspberry Pi boards' circuit design, currently the on-board DSI connector only support 2 DSI lanes(max resolution 720p).
-If you want drive panel has more than 2 lanes,you may need to consider the *compute module*.  
+Due to Raspberry Pi boards' circuit design, current(RPi 4b) on-board DSI connector only routed out 2 DSI lanes(max resolution 720p).
+If you want drive panel more than 2 lanes,you may need consider the *compute module*.  
 ## RPiOS
 You must enable `DRM` first in order to use this driver.  
-In `Raspberry Pi OS` releases after `2022-1-28`, `DRM` is default enabled.  
-Old releases of RPiOS may not support `DRM`,so use latest RPiOS is recommended.  
+In `Raspberry Pi OS` releases after `2022-1-28`, `DRM` is enabled by default.  
+Old releases of RPiOS may not support `DRM`,so use latest version of RPiOS is recommended.  
 
 # How to use
-*Note: if there was no `raspberrypi-kernel-headers` package installed, then use of this script will install it automatically and **upgrade your kernel to latest version**. if you don't want to upgrade,you must download the kernel headers that matching your kernel version and build this driver by yourself.*  
+*Note: if there was no `raspberrypi-kernel-headers` package installed, then use of this setup script will install it automatically and **install latest kernel from apt source**. if you don't willing to upgrade, you must download the kernel headers that matching your kernel version and build this driver on your own.*  
 Clone this repository on your Raspberry Pi：  
 ```bash
 git clone https://github.com/CNflysky/RPI_DSI_Drivers
@@ -31,18 +31,18 @@ Then run:
 ```bash
 sudo ./lcd.sh
 ```  
-if you wants to get adapters，take a look at [`adapters`](https://github.com/CNflysky/RPI_DSI_Drivers/tree/main/adapters)directory.   
-You can view it on the OSHWHub:[Link](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)(Chinese version only)  
+if you want to get adapters，take a look at [`adapters`](./adapters)directory.   
+You can view it on OSHWHub too:[Link](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)(Chinese version only)  
 
-# Make your own customized driver
+# Port your own panel driver
 [Here](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/docs/how_to_make_your_custom_driver.md)  
 *Translated from my blog,may not 100% accurate.*
 
 # Supported(Or WIP) Panel
-| Part Number | Size | Resolution | Interface | Connector | TP | Note |
+| Part Number | Diagonal | Resolution | Interface | Connector | TP | Note |
 | ---- | ---- | --- | --- | --- | --- | -- |
-|W280BF036I| 2.8 Inch| VGA(480x640) | MIPI 1 Lane | 24p Connector | None | |
-|W500IE020| 5.0 Inch | FWVGA(480x854) | MIPI 2 Lane | 30p Connector | None | Working in progress |
+|W280BF036I| 2.8 Inch| VGA(480x640) | DSI 1 Lane | 24p Connector | None | |
+|W500IE020| 5.0 Inch | FWVGA(480x854) | DSI 2 Lane | 30p Connector | None | Working in progress |
 
 # Gallery
 ## W280BF036I
