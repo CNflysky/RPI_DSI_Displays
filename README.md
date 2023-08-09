@@ -13,15 +13,15 @@ Compared from SPI/DPI panels，DSI panels has taken these advantages:
 
 # Limitation
 ## Circuit 
-Due to Raspberry Pi boards' circuit design, current(RPi 4b) on-board DSI connector only routed out 2 DSI lanes(max resolution 720p).
-If you want drive panel more than 2 lanes,you may need consider the *compute module*.  
+Due to the circuit design of Raspberry Pi boards, the current (RPi 4b) on-board DSI connector only routes out 2 DSI lanes, with a maximum resolution of 720p.  
+If you want to drive a panel with more than 2 lanes, you may need to consider the *compute module*.  
 ## RPiOS
 You must enable `DRM` first in order to use this driver.  
 In `Raspberry Pi OS` releases after `2022-1-28`, `DRM` is enabled by default.  
 Old releases of RPiOS may not support `DRM`,so use latest version of RPiOS is recommended.  
 
 # How to use
-*Note: if there was no `raspberrypi-kernel-headers` package installed, then use of this setup script will install it automatically and **install latest kernel from apt source**. if you don't willing to upgrade, you must download the kernel headers that matching your kernel version and build this driver on your own.*  
+*Note: If the `raspberrypi-kernel-headers` package is not installed, then use of this setup script will automatically install it and *install the latest kernel from apt source*. If you do not wish to upgrade, you must download the kernel headers that match your kernel version and build this driver on your own.*  
 Clone this repository on your Raspberry Pi：  
 ```bash
 git clone https://github.com/CNflysky/RPI_DSI_Drivers
