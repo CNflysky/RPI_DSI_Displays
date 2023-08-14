@@ -1,5 +1,5 @@
-# RPI_DSI_Drivers
-Hardware & Kernel DRM Driver for RPI DSI Display.  
+# RPI_DSI_Displays
+Hardware & Kernel DRM Driver for RPI DSI Displays.  
 *Note: This repository is still under development. Feel free to open issues if you have any questions or suggestions.*  
 [Simplified Chinese(简体中文)](./README_zh.md)
 
