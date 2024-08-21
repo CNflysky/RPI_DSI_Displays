@@ -305,7 +305,7 @@ static int dsi_panel_probe(struct mipi_dsi_device *dsi) {
   dsi->format = desc->format;
   dsi->lanes = desc->lanes;
 
-  dsi_panel->panel.prepare_upstream_first = true;
+  dsi_panel->panel.prepare_prev_first = true;
   dsi_panel->reset = devm_gpiod_get(&dsi->dev, "reset", GPIOD_OUT_LOW);
   if (IS_ERR(dsi_panel->reset)) {
     dev_err(&dsi->dev, "Couldn't get our reset GPIO\n");
