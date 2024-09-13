@@ -27,12 +27,13 @@
 			};
 
 			panel:panel@0 {
-				compatible    = "panel-compatible";
+				compatible    = "wlk,w280bf036i";
 				status        = "okay";
 				reg           = <0>;
 				// reset-gpios   = <&gpio 44 0>;
 				reset-gpios   = <&gpio 46 0>; // fix me
 				backlight = <&panel_backlight>;
+				rotation = <0>;
 				port {
 					panel_dsi_port: endpoint {
 						remote-endpoint = <&dsi_out_port>;

@@ -13,26 +13,72 @@ Compared from SPI/DPI panels，DSI panels has taken these advantages:
 
 # Limitation
 ## Circuit 
-Due to the circuit design of Raspberry Pi boards, the current (RPi 4b) on-board DSI connector only routes out 2 DSI lanes, with a maximum resolution of 720p.  
-If you want to drive a panel with more than 2 lanes, you may need to consider the *compute module*.  
+Due to the circuit design of Raspberry Pi boards, RPi 4b on-board DSI connector only routes out 2 DSI lanes, with a maximum resolution of 720p.  
+If you want to drive a panel with more than 2 lanes, you may need to consider the *compute module* or *RPi 5*.  
 ## RPiOS
 You must enable `DRM` first in order to use this driver.  
 In `Raspberry Pi OS` releases after `2022-1-28`, `DRM` is enabled by default.  
 Old releases of RPiOS may not support `DRM`,so use latest version of RPiOS is recommended.  
 
 # How to use
-*Note: If the `raspberrypi-kernel-headers` package is not installed, then use of this setup script will automatically install it and *install the latest kernel from apt source*. If you do not wish to upgrade, you must download the kernel headers that match your kernel version and build this driver on your own.*  
-Clone this repository on your Raspberry Pi：  
+*Note: this tutorial and code only keep compatibility with latest RPiOS. If you are using old RPiOS, you are on your own.  
+Check for kernel headers:
 ```bash
-git clone https://github.com/CNflysky/RPI_DSI_Drivers
-cd RPI_DSI_Drivers/
+ls /lib/modules/`uname -r`/build
 ```
-Then run:
+If not, install it:
 ```bash
-sudo ./lcd.sh
-```  
-if you want to get adapters，take a look at [`adapters`](./adapters)directory.   
+sudo apt install linux-headers-rpi-v8 # for arm64，armv7 users install linux-headers-rpi-v7
+```
+Install `make` and `dtc`:
+```bash
+sudo apt install make device-tree-compiler
+```
+Clone:
+```bash
+git clone https://github.com/CNflysky/RPI_DSI_Displays
+cd RPI_DSI_Displays/src
+```
+Compile driver:
+```
+make
+```
+Move `panel-rpi-dsi-displays.ko` into `/lib/modules`:
+```bash
+sudo cp panel-rpi-dsi-displays.ko /lib/modules/`uname -r`/kernel/drivers/gpu/drm/panel
+sudo depmod
+```
+Compile device tree overlay：
+```bash
+dtc -I dts -O dtb -o vc4-kms-dsi-rpidisp.dtbo vc4-kms-dsi-rpidisp.dts
+```
+Move to `/boot/firmware/overlays`:
+```bash
+sudo cp vc4-kms-dsi-rpidisp.dtbo /boot/firmware/overlays
+```
+Edit `/boot/firmware/config.txt`, add these two lines:
+```
+ignore_lcd=1
+dtoverlay=vc4-kms-dsi-rpidisp
+```
+Reboot.  
+If you want to get adapters，take a look at [`adapters`](./adapters)directory.   
 You can view it on OSHWHub too:[Link](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)(Chinese version only)  
+
+# Rotation
+`vc4-kms-dsi-rpidisp.dts`:
+```dts
+panel:panel@0 {
+				compatible    = "wlk,w280bf036i";
+				status        = "okay";
+				reg           = <0>;
+				// reset-gpios   = <&gpio 44 0>;
+				reset-gpios   = <&gpio 46 0>; // fix me
+				backlight = <&panel_backlight>;
+				rotation = <0>; // Rotation: [0, 90, 180, 270]
+                ...
+}
+```
 
 # Port your own panel driver
 [Here](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/docs/how_to_make_your_custom_driver.md)  
@@ -42,7 +88,6 @@ You can view it on OSHWHub too:[Link](https://oshwhub.com/cnflysky/RaspberryPi-D
 | Part Number | Diagonal | Resolution | Interface | Connector | TP | Note |
 | ---- | ---- | --- | --- | --- | --- | -- |
 |W280BF036I| 2.8 Inch| VGA(480x640) | DSI 1 Lane | 24p Connector | None | |
-|W500IE020| 5.0 Inch | FWVGA(480x854) | DSI 2 Lane | 30p Connector | None | Working in progress |
 
 # Gallery
 ## W280BF036I
