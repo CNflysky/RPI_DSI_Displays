@@ -12,7 +12,7 @@
 #include <linux/regulator/consumer.h>
 #include <video/mipi_display.h>
 
-struct rpi_dsi_panel_desc {
+struct rpi_dsi_display_desc {
   const struct drm_display_mode *mode;
   unsigned int lanes;
   unsigned long flags;
@@ -20,141 +20,141 @@ struct rpi_dsi_panel_desc {
   void (*init_sequence)(struct mipi_dsi_device *dsi);
 };
 
-struct rpi_dsi_panel {
+struct rpi_dsi_display {
   struct drm_panel panel;
   struct mipi_dsi_device *dsi;
-  const struct rpi_dsi_panel_desc *desc;
+  const struct rpi_dsi_display_desc *desc;
   struct gpio_desc *reset;
   enum drm_panel_orientation orientation;
 };
 
-static inline struct rpi_dsi_panel *to_rpi_dsi_panel(struct drm_panel *panel) {
-  return container_of(panel, struct rpi_dsi_panel, panel);
+static inline struct rpi_dsi_display *to_rpi_dsi_display(struct drm_panel *panel) {
+  return container_of(panel, struct rpi_dsi_display, panel);
 }
 
-static inline int rpi_dsi_panel_write(struct mipi_dsi_device *dsi,
+static inline int rpi_dsi_display_write(struct mipi_dsi_device *dsi,
                                       const void *seq, size_t len) {
   return mipi_dsi_dcs_write_buffer(dsi, seq, len);
 }
 
-#define rpi_dsi_panel_cmd(dsi, seq...)                                         \
-  {                                                                            \
-    const uint8_t data[] = {seq};                                              \
-    rpi_dsi_panel_write(dsi, data, ARRAY_SIZE(data));                          \
+#define rpi_dsi_display_cmd(dsi, seq...)                \
+  {                                                   \
+    const uint8_t data[] = {seq};                     \
+    rpi_dsi_display_write(dsi, data, ARRAY_SIZE(data)); \
   }
 
 static void w280bf036i_init_sequence(struct mipi_dsi_device *dsi) {
   // Command2 BK3 Selection: Enable the BK function of Command2
-  rpi_dsi_panel_cmd(dsi, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x13);
+  rpi_dsi_display_cmd(dsi, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x13);
   // Unknown
-  rpi_dsi_panel_cmd(dsi, 0xEF, 0x08);
+  rpi_dsi_display_cmd(dsi, 0xEF, 0x08);
   // Command2 BK0 Selection: Disable the BK function of Command2
-  rpi_dsi_panel_cmd(dsi, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x10);
+  rpi_dsi_display_cmd(dsi, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x10);
   // Display Line Setting
-  rpi_dsi_panel_cmd(dsi, 0xC0, 0x4f, 0x00);
+  rpi_dsi_display_cmd(dsi, 0xC0, 0x4f, 0x00);
   // Porch Control
-  rpi_dsi_panel_cmd(dsi, 0xC1, 0x10, 0x0c);
+  rpi_dsi_display_cmd(dsi, 0xC1, 0x10, 0x0c);
   // Inversion selection & Frame Rate Control
-  rpi_dsi_panel_cmd(dsi, 0xC2, 0x07, 0x14);
+  rpi_dsi_display_cmd(dsi, 0xC2, 0x07, 0x14);
   // Unknown
-  rpi_dsi_panel_cmd(dsi, 0xCC, 0x10);
+  rpi_dsi_display_cmd(dsi, 0xCC, 0x10);
   // Positive Voltage Gamma Control
-  rpi_dsi_panel_cmd(dsi, 0xB0, 0x0a, 0x18, 0x1e, 0x12, 0x16, 0x0c, 0x0e, 0x0d,
+  rpi_dsi_display_cmd(dsi, 0xB0, 0x0a, 0x18, 0x1e, 0x12, 0x16, 0x0c, 0x0e, 0x0d,
                     0x0c, 0x29, 0x06, 0x14, 0x13, 0x29, 0x33, 0x1c);
   // Negative Voltage Gamma Control
-  rpi_dsi_panel_cmd(dsi, 0xB1, 0x0a, 0x19, 0x21, 0x0a, 0x0c, 0x00, 0x0c, 0x03,
+  rpi_dsi_display_cmd(dsi, 0xB1, 0x0a, 0x19, 0x21, 0x0a, 0x0c, 0x00, 0x0c, 0x03,
                     0x03, 0x23, 0x01, 0x0e, 0x0c, 0x27, 0x2b, 0x1c);
 
   // Command2 BK1 Selection: Enable the BK function of Command2
-  rpi_dsi_panel_cmd(dsi, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x11);
+  rpi_dsi_display_cmd(dsi, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x11);
   // Vop Amplitude setting
-  rpi_dsi_panel_cmd(dsi, 0xB0, 0x5d);
+  rpi_dsi_display_cmd(dsi, 0xB0, 0x5d);
   // VCOM amplitude setting
-  rpi_dsi_panel_cmd(dsi, 0xB1, 0x61);
+  rpi_dsi_display_cmd(dsi, 0xB1, 0x61);
   // VGH Voltage setting
-  rpi_dsi_panel_cmd(dsi, 0xB2, 0x84);
+  rpi_dsi_display_cmd(dsi, 0xB2, 0x84);
   // TEST Command Setting
-  rpi_dsi_panel_cmd(dsi, 0xB3, 0x80);
+  rpi_dsi_display_cmd(dsi, 0xB3, 0x80);
   // VGL Voltage setting
-  rpi_dsi_panel_cmd(dsi, 0xB5, 0x4d);
+  rpi_dsi_display_cmd(dsi, 0xB5, 0x4d);
   // Power Control 1
-  rpi_dsi_panel_cmd(dsi, 0xB7, 0x85);
+  rpi_dsi_display_cmd(dsi, 0xB7, 0x85);
   // Power Control 2
-  rpi_dsi_panel_cmd(dsi, 0xB8, 0x20);
+  rpi_dsi_display_cmd(dsi, 0xB8, 0x20);
   // Source pre_drive timing set1
-  rpi_dsi_panel_cmd(dsi, 0xC1, 0x78);
+  rpi_dsi_display_cmd(dsi, 0xC1, 0x78);
   // Source EQ2 Setting
-  rpi_dsi_panel_cmd(dsi, 0xC2, 0x78);
+  rpi_dsi_display_cmd(dsi, 0xC2, 0x78);
   // MIPI Setting 1
-  rpi_dsi_panel_cmd(dsi, 0xD0, 0x88);
+  rpi_dsi_display_cmd(dsi, 0xD0, 0x88);
   // GIP Code
-  rpi_dsi_panel_cmd(dsi, 0xE0, 0x00, 0x00, 0x02);
-  rpi_dsi_panel_cmd(dsi, 0xE1, 0x06, 0xa0, 0x08, 0xa0, 0x05, 0xa0, 0x07, 0xa0,
+  rpi_dsi_display_cmd(dsi, 0xE0, 0x00, 0x00, 0x02);
+  rpi_dsi_display_cmd(dsi, 0xE1, 0x06, 0xa0, 0x08, 0xa0, 0x05, 0xa0, 0x07, 0xa0,
                     0x00, 0x44, 0x44);
-  rpi_dsi_panel_cmd(dsi, 0xE2, 0x20, 0x20, 0x44, 0x44, 0x96, 0xa0, 0x00, 0x00,
+  rpi_dsi_display_cmd(dsi, 0xE2, 0x20, 0x20, 0x44, 0x44, 0x96, 0xa0, 0x00, 0x00,
                     0x96, 0xa0, 0x00, 0x00);
-  rpi_dsi_panel_cmd(dsi, 0xE3, 0x00, 0x00, 0x22, 0x22);
-  rpi_dsi_panel_cmd(dsi, 0xE4, 0x44, 0x44);
-  rpi_dsi_panel_cmd(dsi, 0xE5, 0x0d, 0x91, 0xa0, 0xa0, 0x0f, 0x93, 0xa0, 0xa0,
+  rpi_dsi_display_cmd(dsi, 0xE3, 0x00, 0x00, 0x22, 0x22);
+  rpi_dsi_display_cmd(dsi, 0xE4, 0x44, 0x44);
+  rpi_dsi_display_cmd(dsi, 0xE5, 0x0d, 0x91, 0xa0, 0xa0, 0x0f, 0x93, 0xa0, 0xa0,
                     0x09, 0x8d, 0xa0, 0xa0, 0x0b, 0x8f, 0xa0, 0xa0);
-  rpi_dsi_panel_cmd(dsi, 0xE6, 0x00, 0x00, 0x22, 0x22);
-  rpi_dsi_panel_cmd(dsi, 0xE7, 0x44, 0x44);
-  rpi_dsi_panel_cmd(dsi, 0xE8, 0x0c, 0x90, 0xa0, 0xa0, 0x0e, 0x92, 0xa0, 0xa0,
+  rpi_dsi_display_cmd(dsi, 0xE6, 0x00, 0x00, 0x22, 0x22);
+  rpi_dsi_display_cmd(dsi, 0xE7, 0x44, 0x44);
+  rpi_dsi_display_cmd(dsi, 0xE8, 0x0c, 0x90, 0xa0, 0xa0, 0x0e, 0x92, 0xa0, 0xa0,
                     0x08, 0x8c, 0xa0, 0xa0, 0x0a, 0x8e, 0xa0, 0xa0);
-  rpi_dsi_panel_cmd(dsi, 0xE9, 0x36, 0x00);
-  rpi_dsi_panel_cmd(dsi, 0xEB, 0x00, 0x01, 0xe4, 0xe4, 0x44, 0x88, 0x40);
-  rpi_dsi_panel_cmd(dsi, 0xED, 0xff, 0x45, 0x67, 0xfa, 0x01, 0x2b, 0xcf, 0xff,
+  rpi_dsi_display_cmd(dsi, 0xE9, 0x36, 0x00);
+  rpi_dsi_display_cmd(dsi, 0xEB, 0x00, 0x01, 0xe4, 0xe4, 0x44, 0x88, 0x40);
+  rpi_dsi_display_cmd(dsi, 0xED, 0xff, 0x45, 0x67, 0xfa, 0x01, 0x2b, 0xcf, 0xff,
                     0xff, 0xfc, 0xb2, 0x10, 0xaf, 0x76, 0x54, 0xff);
-  rpi_dsi_panel_cmd(dsi, 0xEF, 0x10, 0x0d, 0x04, 0x08, 0x3f, 0x1f);
+  rpi_dsi_display_cmd(dsi, 0xEF, 0x10, 0x0d, 0x04, 0x08, 0x3f, 0x1f);
   // disable Command2
-  rpi_dsi_panel_cmd(dsi, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x00);
+  rpi_dsi_display_cmd(dsi, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x00);
 }
 
-static int rpi_dsi_panel_prepare(struct drm_panel *panel) {
-  struct rpi_dsi_panel *rpi_dsi_panel = to_rpi_dsi_panel(panel);
-  gpiod_set_value_cansleep(rpi_dsi_panel->reset, 0);
+static int rpi_dsi_display_prepare(struct drm_panel *panel) {
+  struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
+  gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
   msleep(30);
-  gpiod_set_value_cansleep(rpi_dsi_panel->reset, 1);
+  gpiod_set_value_cansleep(rpi_dsi_display->reset, 1);
   msleep(150);
 
-  mipi_dsi_dcs_soft_reset(rpi_dsi_panel->dsi);
+  mipi_dsi_dcs_soft_reset(rpi_dsi_display->dsi);
   msleep(30);
 
-  rpi_dsi_panel->desc->init_sequence(rpi_dsi_panel->dsi);
+  rpi_dsi_display->desc->init_sequence(rpi_dsi_display->dsi);
 
-  mipi_dsi_dcs_set_tear_on(rpi_dsi_panel->dsi, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
-  mipi_dsi_dcs_exit_sleep_mode(rpi_dsi_panel->dsi);
+  mipi_dsi_dcs_set_tear_on(rpi_dsi_display->dsi, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
+  mipi_dsi_dcs_exit_sleep_mode(rpi_dsi_display->dsi);
   msleep(120);
   return 0;
 }
 
-inline static int rpi_dsi_panel_enable(struct drm_panel *panel) {
-  return mipi_dsi_dcs_set_display_on(to_rpi_dsi_panel(panel)->dsi);
+inline static int rpi_dsi_display_enable(struct drm_panel *panel) {
+  return mipi_dsi_dcs_set_display_on(to_rpi_dsi_display(panel)->dsi);
 }
 
-inline static int rpi_dsi_panel_disable(struct drm_panel *panel) {
-  return mipi_dsi_dcs_set_display_off(to_rpi_dsi_panel(panel)->dsi);
+inline static int rpi_dsi_display_disable(struct drm_panel *panel) {
+  return mipi_dsi_dcs_set_display_off(to_rpi_dsi_display(panel)->dsi);
 }
 
-static int rpi_dsi_panel_unprepare(struct drm_panel *panel) {
-  struct rpi_dsi_panel *rpi_dsi_panel = to_rpi_dsi_panel(panel);
+static int rpi_dsi_display_unprepare(struct drm_panel *panel) {
+  struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
 
-  mipi_dsi_dcs_enter_sleep_mode(rpi_dsi_panel->dsi);
+  mipi_dsi_dcs_enter_sleep_mode(rpi_dsi_display->dsi);
 
-  gpiod_set_value_cansleep(rpi_dsi_panel->reset, 0);
+  gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
 
   return 0;
 }
 
-static int rpi_dsi_panel_get_modes(struct drm_panel *panel,
+static int rpi_dsi_display_get_modes(struct drm_panel *panel,
                                    struct drm_connector *connector) {
-  struct rpi_dsi_panel *rpi_dsi_panel = to_rpi_dsi_panel(panel);
-  const struct drm_display_mode *desc_mode = rpi_dsi_panel->desc->mode;
+  struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
+  const struct drm_display_mode *desc_mode = rpi_dsi_display->desc->mode;
   struct drm_display_mode *mode;
 
   mode = drm_mode_duplicate(connector->dev, desc_mode);
   if (!mode) {
-    dev_err(&rpi_dsi_panel->dsi->dev, "failed to add mode %ux%u@%u\n",
+    dev_err(&rpi_dsi_display->dsi->dev, "failed to add mode %ux%u@%u\n",
             desc_mode->hdisplay, desc_mode->vdisplay,
             drm_mode_vrefresh(desc_mode));
     return -ENOMEM;
@@ -170,19 +170,19 @@ static int rpi_dsi_panel_get_modes(struct drm_panel *panel,
   return 1;
 }
 
-static inline enum drm_panel_orientation
-rpi_dsi_panel_get_orientation(struct drm_panel *panel) {
-  struct rpi_dsi_panel *rpi_dsi_panel = to_rpi_dsi_panel(panel);
-  return rpi_dsi_panel->orientation;
+static inline enum drm_panel_orientation rpi_dsi_display_get_orientation(
+    struct drm_panel *panel) {
+  struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
+  return rpi_dsi_display->orientation;
 }
 
-static const struct drm_panel_funcs rpi_dsi_panel_funcs = {
-    .disable = rpi_dsi_panel_disable,
-    .unprepare = rpi_dsi_panel_unprepare,
-    .prepare = rpi_dsi_panel_prepare,
-    .enable = rpi_dsi_panel_enable,
-    .get_modes = rpi_dsi_panel_get_modes,
-    .get_orientation = rpi_dsi_panel_get_orientation,
+static const struct drm_panel_funcs rpi_dsi_display_funcs = {
+    .disable = rpi_dsi_display_disable,
+    .unprepare = rpi_dsi_display_unprepare,
+    .prepare = rpi_dsi_display_prepare,
+    .enable = rpi_dsi_display_enable,
+    .get_modes = rpi_dsi_display_get_modes,
+    .get_orientation = rpi_dsi_display_get_orientation,
 };
 
 static const struct drm_display_mode w280bf036i_mode = {
@@ -204,7 +204,7 @@ static const struct drm_display_mode w280bf036i_mode = {
     .type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
 };
 
-static const struct rpi_dsi_panel_desc w280bf036i_desc = {
+static const struct rpi_dsi_display_desc w280bf036i_desc = {
     .mode = &w280bf036i_mode,
     .lanes = 1,
     .flags =
@@ -212,70 +212,67 @@ static const struct rpi_dsi_panel_desc w280bf036i_desc = {
     .format = MIPI_DSI_FMT_RGB888,
     .init_sequence = w280bf036i_init_sequence};
 
-static int rpi_dsi_panel_probe(struct mipi_dsi_device *dsi) {
-  struct rpi_dsi_panel *rpi_dsi_panel =
-      devm_kzalloc(&dsi->dev, sizeof(*rpi_dsi_panel), GFP_KERNEL);
-  if (!rpi_dsi_panel)
-    return -ENOMEM;
+static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi) {
+  struct rpi_dsi_display *rpi_dsi_display =
+      devm_kzalloc(&dsi->dev, sizeof(*rpi_dsi_display), GFP_KERNEL);
+  if (!rpi_dsi_display) return -ENOMEM;
 
-  const struct rpi_dsi_panel_desc *desc = of_device_get_match_data(&dsi->dev);
+  const struct rpi_dsi_display_desc *desc = of_device_get_match_data(&dsi->dev);
   dsi->mode_flags = desc->flags;
   dsi->format = desc->format;
   dsi->lanes = desc->lanes;
 
-  rpi_dsi_panel->panel.prepare_prev_first = true;
-  rpi_dsi_panel->reset = devm_gpiod_get(&dsi->dev, "reset", GPIOD_OUT_LOW);
+  rpi_dsi_display->panel.prepare_prev_first = true;
+  rpi_dsi_display->reset = devm_gpiod_get(&dsi->dev, "reset", GPIOD_OUT_LOW);
 
-  if (IS_ERR(rpi_dsi_panel->reset)) {
+  if (IS_ERR(rpi_dsi_display->reset)) {
     dev_err(&dsi->dev, "Failed to get reset GPIO\n");
-    return PTR_ERR(rpi_dsi_panel->reset);
+    return PTR_ERR(rpi_dsi_display->reset);
   }
 
   int ret = of_drm_get_panel_orientation(dsi->dev.of_node,
-                                         &rpi_dsi_panel->orientation);
+                                         &rpi_dsi_display->orientation);
   if (ret < 0)
     return dev_err_probe(&dsi->dev, ret, "Failed to get orientation\n");
 
-  drm_panel_init(&rpi_dsi_panel->panel, &dsi->dev, &rpi_dsi_panel_funcs,
+  drm_panel_init(&rpi_dsi_display->panel, &dsi->dev, &rpi_dsi_display_funcs,
                  DRM_MODE_CONNECTOR_DSI);
 
-  ret = drm_panel_of_backlight(&rpi_dsi_panel->panel);
-  if (ret)
-    return ret;
+  ret = drm_panel_of_backlight(&rpi_dsi_display->panel);
+  if (ret) return ret;
 
-  drm_panel_add(&rpi_dsi_panel->panel);
+  drm_panel_add(&rpi_dsi_display->panel);
 
-  mipi_dsi_set_drvdata(dsi, rpi_dsi_panel);
-  rpi_dsi_panel->dsi = dsi;
-  rpi_dsi_panel->desc = desc;
-  if ((ret = mipi_dsi_attach(dsi)))
-    drm_panel_remove(&rpi_dsi_panel->panel);
+  mipi_dsi_set_drvdata(dsi, rpi_dsi_display);
+  rpi_dsi_display->dsi = dsi;
+  rpi_dsi_display->desc = desc;
+  if ((ret = mipi_dsi_attach(dsi))) drm_panel_remove(&rpi_dsi_display->panel);
   return ret;
 }
 
-static void rpi_dsi_panel_remove(struct mipi_dsi_device *dsi) {
-  struct rpi_dsi_panel *rpi_dsi_panel = mipi_dsi_get_drvdata(dsi);
+static void rpi_dsi_display_remove(struct mipi_dsi_device *dsi) {
+  struct rpi_dsi_display *rpi_dsi_display = mipi_dsi_get_drvdata(dsi);
 
   mipi_dsi_detach(dsi);
-  drm_panel_remove(&rpi_dsi_panel->panel);
+  drm_panel_remove(&rpi_dsi_display->panel);
 }
 
-static const struct of_device_id dsi_panel_of_match[] = {
+static const struct of_device_id rpi_dsi_display_of_match[] = {
     {.compatible = "wlk,w280bf036i", .data = &w280bf036i_desc}, {}};
 
-MODULE_DEVICE_TABLE(of, dsi_panel_of_match);
+MODULE_DEVICE_TABLE(of, rpi_dsi_display_of_match);
 
-static struct mipi_dsi_driver rpi_dsi_panel = {
-    .probe = rpi_dsi_panel_probe,
-    .remove = rpi_dsi_panel_remove,
+static struct mipi_dsi_driver rpi_dsi_display = {
+    .probe = rpi_dsi_display_probe,
+    .remove = rpi_dsi_display_remove,
     .driver =
         {
-            .name = "rpi_dsi_panel_driver",
-            .of_match_table = dsi_panel_of_match,
+            .name = "rpi_dsi_display_driver",
+            .of_match_table = rpi_dsi_display_of_match,
         },
 };
 
-module_mipi_dsi_driver(rpi_dsi_panel);
+module_mipi_dsi_driver(rpi_dsi_display);
 MODULE_AUTHOR("cnflysky@qq.com");
 MODULE_DESCRIPTION("RPI DSI Display driver");
 MODULE_LICENSE("GPL");
