@@ -43,14 +43,14 @@ Compile driver:
 ```
 make
 ```
-Move `panel-rpi-dsi-displays.ko` into `/lib/modules`:
+Move `panel-rpi-dsi-display.ko` into `/lib/modules`:
 ```bash
-sudo cp panel-rpi-dsi-displays.ko /lib/modules/`uname -r`/kernel/drivers/gpu/drm/panel
+sudo cp panel-rpi-dsi-display.ko /lib/modules/`uname -r`/kernel/drivers/gpu/drm/panel
 sudo depmod
 ```
-Compile device tree overlay：
+Compile device tree overlay (select overlay according to your board)：
 ```bash
-dtc -I dts -O dtb -o vc4-kms-dsi-rpidisp.dtbo vc4-kms-dsi-rpidisp.dts
+dtc -I dts -O dtb -o vc4-kms-dsi-rpidisp.dtbo vc4-kms-dsi-rpidisp-pi4.dts
 ```
 Move to `/boot/firmware/overlays`:
 ```bash
@@ -72,8 +72,7 @@ panel:panel@0 {
 				compatible    = "wlk,w280bf036i";
 				status        = "okay";
 				reg           = <0>;
-				// reset-gpios   = <&gpio 44 0>;
-				reset-gpios   = <&gpio 46 0>; // fix me
+				no-reset;
 				backlight = <&panel_backlight>;
 				rotation = <0>; // Rotation: [0, 90, 180, 270]
                 ...

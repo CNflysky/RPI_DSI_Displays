@@ -37,8 +37,7 @@
 				compatible    = "wlk,w280bf036i";
 				status        = "okay";
 				reg           = <0>;
-				// reset-gpios   = <&gpio 38 0>;
-				reset-gpios   = <&rp1_gpio 50 0>;// fix me
+				no-reset;
 				backlight = <&rpi_dsi_display_backlight>;
 				rotation = <0>;
 				port {

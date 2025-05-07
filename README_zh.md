@@ -41,14 +41,14 @@ cd RPI_DSI_Displays/src
 ```
 make
 ```
-编译完成后当前目录下会出现`panel-rpi-dsi-displays.ko`，将其复制到内核模块文件夹中:
+编译完成后当前目录下会出现`panel-rpi-dsi-display.ko`，将其复制到内核模块文件夹中:
 ```bash
-sudo cp panel-rpi-dsi-displays.ko /lib/modules/`uname -r`/kernel/drivers/gpu/drm/panel
+sudo cp panel-rpi-dsi-display.ko /lib/modules/`uname -r`/kernel/drivers/gpu/drm/panel
 sudo depmod
 ```
-复制完成后，编译设备树overlay文件：
+复制完成后，编译设备树overlay文件（根据需要编译不同的文件）：
 ```bash
-dtc -I dts -O dtb -o vc4-kms-dsi-rpidisp.dtbo vc4-kms-dsi-rpidisp.dts
+dtc -I dts -O dtb -o vc4-kms-dsi-rpidisp.dtbo vc4-kms-dsi-rpidisp-pi4.dts
 ```
 编译完成后:
 ```bash
