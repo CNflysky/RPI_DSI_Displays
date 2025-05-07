@@ -24,6 +24,7 @@ struct rpi_dsi_display {
 	const struct rpi_dsi_display_desc *desc;
 	struct gpio_desc *reset;
 	enum drm_panel_orientation orientation;
+	bool no_reset;
 };
 
 static inline struct rpi_dsi_display *
@@ -113,19 +114,25 @@ static int rpi_dsi_display_prepare(struct drm_panel *panel)
 {
 	struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
 	struct mipi_dsi_multi_context ctx = { .dsi = rpi_dsi_display->dsi };
-	gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
-	usleep_range(30 * 1000, 50 * 1000);
-	gpiod_set_value_cansleep(rpi_dsi_display->reset, 1);
-	usleep_range(150 * 1000, 200 * 1000);
+	if (!rpi_dsi_display->no_reset) {
+		gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
+		msleep(20);
+		gpiod_set_value_cansleep(rpi_dsi_display->reset, 1);
+		msleep(150);
 
-	mipi_dsi_dcs_soft_reset_multi(&ctx);
-	usleep_range(30 * 1000, 50 * 1000);
+		mipi_dsi_dcs_soft_reset_multi(&ctx);
+		msleep(120);
+	}
 
-	int ret = rpi_dsi_display->desc->init_sequence(rpi_dsi_display->dsi);
-	if (IS_ERR(&ret)) {
-		dev_err(panel->dev,
-			      "failed to send init sequence to panel: %d", ret);
-		return PTR_ERR(&ret);
+	if (rpi_dsi_display->desc->init_sequence) {
+		int ret = rpi_dsi_display->desc->init_sequence(
+			rpi_dsi_display->dsi);
+		if (IS_ERR(&ret)) {
+			dev_err(panel->dev,
+				"Failed to send init sequence to panel: %d",
+				ret);
+			return PTR_ERR(&ret);
+		}
 	}
 
 	mipi_dsi_dcs_set_tear_on_multi(&ctx, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
@@ -155,9 +162,8 @@ static int rpi_dsi_display_unprepare(struct drm_panel *panel)
 	struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
 	struct mipi_dsi_multi_context ctx = { .dsi = rpi_dsi_display->dsi };
 	mipi_dsi_dcs_enter_sleep_mode_multi(&ctx);
-
-	gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
-
+	if (!rpi_dsi_display->no_reset)
+		gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
 	return ctx.accum_err;
 }
 
@@ -221,6 +227,25 @@ static const struct drm_display_mode w280bf036i_mode = {
 	.type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
 };
 
+static const struct drm_display_mode tdo_qhd0500d5_mode = {
+	.clock = 30000,
+
+	.hdisplay = 540,
+	.hsync_start = 540 + /* HFP */ 10,
+	.hsync_end = 540 + 10 + /* HSync */ 2,
+	.htotal = 540 + 10 + 2 + /* HBP */ 10,
+
+	.vdisplay = 960,
+	.vsync_start = 960 + /* VFP */ 10,
+	.vsync_end = 960 + 10 + /* VSync */ 2,
+	.vtotal = 960 + 10 + 2 + /* VBP */ 10,
+
+	.width_mm = 43,
+	.height_mm = 57,
+
+	.type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
+};
+
 static const struct rpi_dsi_display_desc w280bf036i_desc = {
 	.mode = &w280bf036i_mode,
 	.lanes = 1,
@@ -228,6 +253,14 @@ static const struct rpi_dsi_display_desc w280bf036i_desc = {
 		 MIPI_DSI_MODE_LPM,
 	.format = MIPI_DSI_FMT_RGB888,
 	.init_sequence = w280bf036i_init_sequence
+};
+
+static const struct rpi_dsi_display_desc tdo_qhd0500d5_desc = {
+	.mode = &tdo_qhd0500d5_mode,
+	.lanes = 2,
+	.flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST |
+		 MIPI_DSI_MODE_LPM,
+	.format = MIPI_DSI_FMT_RGB888
 };
 
 static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi)
@@ -244,12 +277,18 @@ static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi)
 	dsi->lanes = desc->lanes;
 
 	rpi_dsi_display->panel.prepare_prev_first = true;
-	rpi_dsi_display->reset =
-		devm_gpiod_get(&dsi->dev, "reset", GPIOD_OUT_LOW);
 
-	if (IS_ERR(rpi_dsi_display->reset)) {
-		dev_err(&dsi->dev, "Failed to get reset GPIO\n");
-		return PTR_ERR(rpi_dsi_display->reset);
+	bool no_reset =
+		device_property_present(&dsi->dev, "no-reset");
+	rpi_dsi_display->no_reset = no_reset;
+
+	if (!no_reset) {
+		rpi_dsi_display->reset =
+			devm_gpiod_get(&dsi->dev, "reset", GPIOD_OUT_HIGH);
+		if (IS_ERR(rpi_dsi_display->reset)) {
+			dev_err(&dsi->dev, "Failed to get reset GPIO\n");
+			return PTR_ERR(rpi_dsi_display->reset);
+		}
 	}
 
 	int ret = of_drm_get_panel_orientation(dsi->dev.of_node,
@@ -288,6 +327,7 @@ static void rpi_dsi_display_remove(struct mipi_dsi_device *dsi)
 
 static const struct of_device_id rpi_dsi_display_of_match[] = {
 	{ .compatible = "wlk,w280bf036i", .data = &w280bf036i_desc },
+	{ .compatible = "truly,tdo-qhd0500d5", .data = &tdo_qhd0500d5_desc },
 	{}
 };
 
