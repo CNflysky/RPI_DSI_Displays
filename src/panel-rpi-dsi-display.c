@@ -24,16 +24,15 @@ struct rpi_dsi_display {
 	const struct rpi_dsi_display_desc *desc;
 	struct gpio_desc *reset;
 	enum drm_panel_orientation orientation;
-	bool no_reset;
 };
 
-static inline struct rpi_dsi_display *
+inline static struct rpi_dsi_display *
 to_rpi_dsi_display(struct drm_panel *panel)
 {
 	return container_of(panel, struct rpi_dsi_display, panel);
 }
 
-static inline int w280bf036i_init_sequence(struct mipi_dsi_device *dsi)
+inline static int w280bf036i_init_sequence(struct mipi_dsi_device *dsi)
 {
 	struct mipi_dsi_multi_context ctx = { .dsi = dsi };
 	// Command2 BK3 Selection: Enable the BK function of Command2
@@ -114,15 +113,15 @@ static int rpi_dsi_display_prepare(struct drm_panel *panel)
 {
 	struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
 	struct mipi_dsi_multi_context ctx = { .dsi = rpi_dsi_display->dsi };
-	if (!rpi_dsi_display->no_reset) {
+	if (rpi_dsi_display->reset) {
 		gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
 		msleep(20);
 		gpiod_set_value_cansleep(rpi_dsi_display->reset, 1);
 		msleep(150);
-
-		mipi_dsi_dcs_soft_reset_multi(&ctx);
-		msleep(120);
 	}
+
+	mipi_dsi_dcs_soft_reset_multi(&ctx);
+	msleep(120);
 
 	if (rpi_dsi_display->desc->init_sequence) {
 		int ret = rpi_dsi_display->desc->init_sequence(
@@ -162,7 +161,7 @@ static int rpi_dsi_display_unprepare(struct drm_panel *panel)
 	struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
 	struct mipi_dsi_multi_context ctx = { .dsi = rpi_dsi_display->dsi };
 	mipi_dsi_dcs_enter_sleep_mode_multi(&ctx);
-	if (!rpi_dsi_display->no_reset)
+	if (!rpi_dsi_display->reset)
 		gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
 	return ctx.accum_err;
 }
@@ -192,7 +191,7 @@ static int rpi_dsi_display_get_modes(struct drm_panel *panel,
 	return 1;
 }
 
-static inline enum drm_panel_orientation
+inline static enum drm_panel_orientation
 rpi_dsi_display_get_orientation(struct drm_panel *panel)
 {
 	struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
@@ -277,18 +276,11 @@ static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi)
 	dsi->lanes = desc->lanes;
 
 	rpi_dsi_display->panel.prepare_prev_first = true;
-
-	bool no_reset =
-		device_property_present(&dsi->dev, "no-reset");
-	rpi_dsi_display->no_reset = no_reset;
-
-	if (!no_reset) {
-		rpi_dsi_display->reset =
-			devm_gpiod_get(&dsi->dev, "reset", GPIOD_OUT_HIGH);
-		if (IS_ERR(rpi_dsi_display->reset)) {
-			dev_err(&dsi->dev, "Failed to get reset GPIO\n");
-			return PTR_ERR(rpi_dsi_display->reset);
-		}
+	rpi_dsi_display->reset =
+		devm_gpiod_get_optional(&dsi->dev, "reset", GPIOD_OUT_HIGH);
+	if (IS_ERR(rpi_dsi_display->reset)) {
+		dev_err(&dsi->dev, "Failed to get reset GPIO\n");
+		return PTR_ERR(rpi_dsi_display->reset);
 	}
 
 	int ret = of_drm_get_panel_orientation(dsi->dev.of_node,
@@ -325,13 +317,13 @@ static void rpi_dsi_display_remove(struct mipi_dsi_device *dsi)
 	drm_panel_remove(&rpi_dsi_display->panel);
 }
 
-static const struct of_device_id rpi_dsi_display_of_match[] = {
+static const struct of_device_id rpi_dsi_display_ids[] = {
 	{ .compatible = "wlk,w280bf036i", .data = &w280bf036i_desc },
 	{ .compatible = "truly,tdo-qhd0500d5", .data = &tdo_qhd0500d5_desc },
 	{}
 };
 
-MODULE_DEVICE_TABLE(of, rpi_dsi_display_of_match);
+MODULE_DEVICE_TABLE(of, rpi_dsi_display_ids);
 
 static struct mipi_dsi_driver rpi_dsi_display = {
     .probe = rpi_dsi_display_probe,
@@ -339,7 +331,7 @@ static struct mipi_dsi_driver rpi_dsi_display = {
     .driver =
         {
             .name = "rpi_dsi_display_driver",
-            .of_match_table = rpi_dsi_display_of_match,
+            .of_match_table = rpi_dsi_display_ids,
         },
 };
 

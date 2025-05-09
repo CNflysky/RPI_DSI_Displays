@@ -37,7 +37,6 @@
 				compatible    = "wlk,w280bf036i";
 				status        = "okay";
 				reg           = <0>;
-				no-reset;
 				backlight = <&rpi_dsi_display_backlight>;
 				rotation = <0>;
 				port {
