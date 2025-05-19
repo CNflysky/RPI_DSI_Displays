@@ -35,7 +35,6 @@ struct rpi_dsi_display {
 	enum drm_panel_orientation orientation;
 };
 
-
 inline static struct rpi_dsi_display *
 to_rpi_dsi_display(struct drm_panel *panel)
 {
@@ -117,6 +116,15 @@ inline static int w280bf036i_init_sequence(struct mipi_dsi_device *dsi)
 	// disable Command2
 	mipi_dsi_dcs_write_seq_multi(&ctx, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x00);
 	mipi_dsi_dcs_set_tear_on_multi(&ctx, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
+	return ctx.accum_err;
+}
+
+inline static int tdo_qhd0500d5_init_sequence(struct mipi_dsi_device *dsi)
+{
+	struct mipi_dsi_multi_context ctx = { .dsi = dsi };
+	// enable backlight
+	mipi_dsi_dcs_write_seq_multi(&ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY,
+				     0x24);
 	return ctx.accum_err;
 }
 
@@ -273,12 +281,11 @@ static const struct drm_display_mode tdo_qhd0500d5_mode = {
 	.type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
 };
 
-static const struct power_on_timing w280bf036i_pwr_timing = {
-	.post_reset = 20,
-	.reset_low = 20,
-	.after_reset = 120,
-	.slpout = 120
-};
+static const struct power_on_timing w280bf036i_pwr_timing = { .post_reset = 20,
+							      .reset_low = 20,
+							      .after_reset =
+								      120,
+							      .slpout = 120 };
 
 static const struct rpi_dsi_display_desc w280bf036i_desc = {
 	.mode = &w280bf036i_mode,
@@ -303,6 +310,7 @@ static const struct rpi_dsi_display_desc tdo_qhd0500d5_desc = {
 	.flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST |
 		 MIPI_DSI_MODE_LPM,
 	.format = MIPI_DSI_FMT_RGB888,
+	.init_sequence = tdo_qhd0500d5_init_sequence,
 	.pwr_timing = &tdo_qhd0500d5_pwr_timing
 };
 
