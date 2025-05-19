@@ -20,7 +20,7 @@ You must enable `DRM` first in order to use this driver.
 In `Raspberry Pi OS` releases after `2022-1-28`, `DRM` is enabled by default.  
 Old releases of RPiOS may not support `DRM`,so use latest version of RPiOS is recommended.  
 
-# How to use
+# Configuration
 *Note: this tutorial and code only keep compatibility with latest RPiOS. If you are using old RPiOS, you are on your own.  
 Check for kernel headers:
 ```bash
@@ -39,41 +39,33 @@ Clone:
 git clone https://github.com/CNflysky/RPI_DSI_Displays
 cd RPI_DSI_Displays/src
 ```
-Compile driver:
-```
-make
-```
-Move `panel-rpi-dsi-display.ko` into `/lib/modules`:
+
+## Targets
+- w280bf036i-pi4
+- w280bf036i-pi5
+- tdo-qhd0500d5-pi4
+- tdo-qhd0500d5-pi5  
+  
+e.g. install 2.8 Inch driver for RPi 4:  
 ```bash
-sudo cp panel-rpi-dsi-display.ko /lib/modules/`uname -r`/kernel/drivers/gpu/drm/panel
-sudo depmod
+make w280bf036i-pi4
+sudo make install
 ```
-Compile device tree overlay (select overlay according to your board)：
-```bash
-dtc -I dts -O dtb -o vc4-kms-dsi-rpidisp.dtbo vc4-kms-dsi-rpidisp-pi4.dts
-```
-Move to `/boot/firmware/overlays`:
-```bash
-sudo cp vc4-kms-dsi-rpidisp.dtbo /boot/firmware/overlays
-```
-Edit `/boot/firmware/config.txt`, add these two lines:
-```
-ignore_lcd=1
-dtoverlay=vc4-kms-dsi-rpidisp
-```
-Reboot.  
+Reboot.
+
+use `sudo make remove` to uninstall driver.    
+
 If you want to get adapters，take a look at [`adapters`](./adapters)directory.   
 You can view it on OSHWHub too:[Link](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)(Chinese version only)  
 
 # Rotation
-`vc4-kms-dsi-rpidisp.dts`:
+edit dts files:  
 ```dts
-panel:panel@0 {
-				compatible    = "wlk,w280bf036i";
+rpi_dsi_display:rpi-dsi-display@0 {
+				compatible    = <...>;
 				status        = "okay";
 				reg           = <0>;
-				no-reset;
-				backlight = <&panel_backlight>;
+				backlight = <&rpi_dsi_display_gpio_backlight>;
 				rotation = <0>; // Rotation: [0, 90, 180, 270]
                 ...
 }
@@ -86,7 +78,8 @@ panel:panel@0 {
 # Supported(Or WIP) Panel
 | Part Number | Diagonal | Resolution | Interface | Connector | TP | Note |
 | ---- | ---- | --- | --- | --- | --- | -- |
-|W280BF036I| 2.8 Inch| VGA(480x640) | DSI 1 Lane | 24p Connector | None | |
+|W280BF036I| 2.8 Inch| VGA(480x640) | DSI 1 Lane | 24p | None | |
+|TDO-QHD0500D5| 5.3 Inch| QHD(540x960) | DSI 2 Lane | 33p | FT5406 | |
 
 # Gallery
 ## W280BF036I

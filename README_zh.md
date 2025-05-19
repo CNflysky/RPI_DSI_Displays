@@ -18,7 +18,7 @@
 在2022-1-28日以后发布的`Raspberry Pi OS`已经默认启用了`DRM`。
 旧版本的RPiOS可能不支持`DRM`，因此推荐使用最新版本的RPiOS。
 
-# 如何使用
+# 配置
 *注意：教程及代码只保证对于最新版(latest)RPi OS的兼容性。如果您使用的不是最新版系统，则教程可能不适用于您的系统。*  
 检查内核头文件是否存在:
 ```bash
@@ -37,42 +37,34 @@ sudo apt install make device-tree-compiler
 git clone https://github.com/CNflysky/RPI_DSI_Displays
 cd RPI_DSI_Displays/src
 ```
-编译驱动:
-```
-make
-```
-编译完成后当前目录下会出现`panel-rpi-dsi-display.ko`，将其复制到内核模块文件夹中:
+
+## 目标
+- w280bf036i-pi4
+- w280bf036i-pi5
+- tdo-qhd0500d5-pi4
+- tdo-qhd0500d5-pi5  
+
+请根据需要，选择编译目标。  
+例如，编译适用于树莓派4的2.8寸屏驱动：
 ```bash
-sudo cp panel-rpi-dsi-display.ko /lib/modules/`uname -r`/kernel/drivers/gpu/drm/panel
-sudo depmod
-```
-复制完成后，编译设备树overlay文件（根据需要编译不同的文件）：
-```bash
-dtc -I dts -O dtb -o vc4-kms-dsi-rpidisp.dtbo vc4-kms-dsi-rpidisp-pi4.dts
-```
-编译完成后:
-```bash
-sudo cp vc4-kms-dsi-rpidisp.dtbo /boot/firmware/overlays
-```
-编辑`/boot/firmware/config.txt`，加入下面两行:
-```
-ignore_lcd=1
-dtoverlay=vc4-kms-dsi-rpidisp
+make w280bf036i-pi4
+sudo make install
 ```
 重启。  
+
+使用`sudo make remove`来进行卸载。  
+
 如果您需要自己制作转接板，请查看本仓库下的[`adapters`](./adapters)文件夹。  
 您也可以在OSHWHub上查看:[链接](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)  
 
 # 配置
-如果需要修改屏幕方向，编辑`vc4-kms-dsi-rpidisp.dts`:
+如果需要修改屏幕方向，编辑对应的dts:
 ```dts
-panel:panel@0 {
-				compatible    = "wlk,w280bf036i";
+rpi_dsi_display:rpi-dsi-display@0 {
+				compatible    = <...>;
 				status        = "okay";
 				reg           = <0>;
-				// reset-gpios   = <&gpio 44 0>;
-				reset-gpios   = <&gpio 46 0>; // fix me
-				backlight = <&panel_backlight>;
+				backlight = <&rpi_dsi_display_gpio_backlight>;
 				rotation = <0>; // 屏幕方向，可选值为0, 90, 180, 270
                 ...
 }
@@ -84,7 +76,8 @@ panel:panel@0 {
 # 已经适配(或者正在适配)的屏幕
 | 料号 | 尺寸 | 分辨率 | 接口 | 连接器 | 触摸 | 备注 |
 | ---- | ---- | --- | --- | --- | --- | --- |
-|W280BF036I| 2.8 Inch| VGA(480x640) | DSI 1 Lane | 24p 连接器 | 无 | |
+|W280BF036I| 2.8 Inch| VGA(480x640) | DSI 1 Lane | 24p | 无 | |
+|TDO-QHD0500D5| 5.3 Inch | QHD(540x960) | DSI 2 Lanes | 33p | FT5406 | |
 
 # 展示
 ## W280BF036I

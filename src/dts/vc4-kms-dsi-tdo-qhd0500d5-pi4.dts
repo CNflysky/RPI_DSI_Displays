@@ -1,0 +1,86 @@
+/dts-v1/;
+/plugin/;
+/ {
+	compatible = "raspberrypi,4-model-b","brcm,bcm2711";
+	fragment@0 {
+		target = <&i2c_csi_dsi>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			status = "okay";
+			pca9536:pca9536@41{
+				compatible = "nxp,pca9536";
+				reg = <0x41>;
+				gpio-controller;
+				#gpio-cells = <2>;
+				status = "okay";
+				gpio-line-names = "panel-rst",
+				"tp-rst",
+				"ctp-led",
+				"gpio-backlight";
+			};
+			
+			ft5406@38 {
+				compatible = "edt,edt-ft5406";
+				reg = <0x38>;
+				reset-gpios = <&pca9536 1 1>;
+				status = "okay";
+				touchscreen-size-x = <540>;
+				touchscreen-size-y = <960>;
+			};
+		};
+	};
+	
+	fragment@1 {
+		target = <&i2c0mux>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+	
+	fragment@2 {
+		target = <&i2c0if>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+	
+	fragment@3 {
+		target-path="/";
+		__overlay__ {
+			rpi_dsi_display_gpio_backlight:rpi-dsi-display-gpio-backlight {
+				compatible = "gpio-backlight";
+				gpios = <&pca9536 3 0>;
+				default-on;
+			};
+		};
+	};
+	
+	fragment@4 {
+		target = <&dsi1>;
+		__overlay__{
+			status = "okay";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			port {
+				rpi_dsi_out_port:endpoint {
+					remote-endpoint = <&rpi_dsi_port>;
+				};
+			};
+			
+			rpi_dsi_display:rpi-dsi-display@0 {
+				compatible    = "truly,tdo-qhd0500d5";
+				status        = "okay";
+				reg           = <0>;
+				// reset-gpios = <&pca9536 0 0>;
+				backlight = <&rpi_dsi_display_gpio_backlight>;
+				rotation = <0>;
+				port {
+					rpi_dsi_port: endpoint {
+						remote-endpoint = <&rpi_dsi_out_port>;
+					};
+				};
+			};
+		};
+	};
+};

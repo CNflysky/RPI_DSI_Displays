@@ -9,6 +9,14 @@
 #include <linux/module.h>
 #include <video/mipi_display.h>
 #include <linux/of.h>
+#include <linux/backlight.h>
+
+struct power_on_timing {
+	unsigned long post_reset;
+	unsigned long reset_low;
+	unsigned long after_reset;
+	unsigned long slpout;
+};
 
 struct rpi_dsi_display_desc {
 	const struct drm_display_mode *mode;
@@ -16,6 +24,7 @@ struct rpi_dsi_display_desc {
 	unsigned long flags;
 	enum mipi_dsi_pixel_format format;
 	int (*init_sequence)(struct mipi_dsi_device *dsi);
+	const struct power_on_timing *pwr_timing;
 };
 
 struct rpi_dsi_display {
@@ -25,6 +34,7 @@ struct rpi_dsi_display {
 	struct gpio_desc *reset;
 	enum drm_panel_orientation orientation;
 };
+
 
 inline static struct rpi_dsi_display *
 to_rpi_dsi_display(struct drm_panel *panel)
@@ -106,6 +116,7 @@ inline static int w280bf036i_init_sequence(struct mipi_dsi_device *dsi)
 				     0x1f);
 	// disable Command2
 	mipi_dsi_dcs_write_seq_multi(&ctx, 0xFF, 0x77, 0x01, 0x00, 0x00, 0x00);
+	mipi_dsi_dcs_set_tear_on_multi(&ctx, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
 	return ctx.accum_err;
 }
 
@@ -114,14 +125,16 @@ static int rpi_dsi_display_prepare(struct drm_panel *panel)
 	struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
 	struct mipi_dsi_multi_context ctx = { .dsi = rpi_dsi_display->dsi };
 	if (rpi_dsi_display->reset) {
-		gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
-		msleep(20);
 		gpiod_set_value_cansleep(rpi_dsi_display->reset, 1);
-		msleep(150);
+		msleep(rpi_dsi_display->desc->pwr_timing->post_reset);
+		gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
+		msleep(rpi_dsi_display->desc->pwr_timing->reset_low);
+		gpiod_set_value_cansleep(rpi_dsi_display->reset, 1);
+		msleep(rpi_dsi_display->desc->pwr_timing->after_reset);
 	}
 
-	mipi_dsi_dcs_soft_reset_multi(&ctx);
-	msleep(120);
+	// mipi_dsi_dcs_soft_reset_multi(&ctx);
+	// msleep(rpi_dsi_display->desc->reset_delay);
 
 	if (rpi_dsi_display->desc->init_sequence) {
 		int ret = rpi_dsi_display->desc->init_sequence(
@@ -133,10 +146,8 @@ static int rpi_dsi_display_prepare(struct drm_panel *panel)
 			return PTR_ERR(&ret);
 		}
 	}
-
-	mipi_dsi_dcs_set_tear_on_multi(&ctx, MIPI_DSI_DCS_TEAR_MODE_VBLANK);
 	mipi_dsi_dcs_exit_sleep_mode_multi(&ctx);
-	msleep(120);
+	msleep(rpi_dsi_display->desc->pwr_timing->slpout);
 	return ctx.accum_err;
 }
 
@@ -207,6 +218,23 @@ static const struct drm_panel_funcs rpi_dsi_display_funcs = {
 	.get_orientation = rpi_dsi_display_get_orientation,
 };
 
+static int rpi_dsi_display_set_brightness(struct backlight_device *bl)
+{
+	struct rpi_dsi_display *rpi_dsi_display = bl_get_data(bl);
+	struct mipi_dsi_device *dsi = rpi_dsi_display->dsi;
+	uint8_t brightness = bl->props.brightness;
+	int ret = 0;
+	ret = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
+				 &brightness, sizeof(brightness));
+	if (ret < 0)
+		return ret;
+	return 0;
+}
+
+static const struct backlight_ops rpi_dsi_display_bl_ops = {
+	.update_status = rpi_dsi_display_set_brightness,
+};
+
 static const struct drm_display_mode w280bf036i_mode = {
 	.clock = 22572,
 
@@ -245,13 +273,28 @@ static const struct drm_display_mode tdo_qhd0500d5_mode = {
 	.type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
 };
 
+static const struct power_on_timing w280bf036i_pwr_timing = {
+	.post_reset = 20,
+	.reset_low = 20,
+	.after_reset = 120,
+	.slpout = 120
+};
+
 static const struct rpi_dsi_display_desc w280bf036i_desc = {
 	.mode = &w280bf036i_mode,
 	.lanes = 1,
 	.flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST |
 		 MIPI_DSI_MODE_LPM,
 	.format = MIPI_DSI_FMT_RGB888,
-	.init_sequence = w280bf036i_init_sequence
+	.init_sequence = w280bf036i_init_sequence,
+	.pwr_timing = &w280bf036i_pwr_timing
+};
+
+static const struct power_on_timing tdo_qhd0500d5_pwr_timing = {
+	.post_reset = 50,
+	.reset_low = 50,
+	.after_reset = 120,
+	.slpout = 150
 };
 
 static const struct rpi_dsi_display_desc tdo_qhd0500d5_desc = {
@@ -259,7 +302,8 @@ static const struct rpi_dsi_display_desc tdo_qhd0500d5_desc = {
 	.lanes = 2,
 	.flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_BURST |
 		 MIPI_DSI_MODE_LPM,
-	.format = MIPI_DSI_FMT_RGB888
+	.format = MIPI_DSI_FMT_RGB888,
+	.pwr_timing = &tdo_qhd0500d5_pwr_timing
 };
 
 static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi)
@@ -298,6 +342,23 @@ static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi)
 	ret = drm_panel_of_backlight(&rpi_dsi_display->panel);
 	if (IS_ERR(&ret))
 		return ret;
+
+	if (!rpi_dsi_display->panel.backlight) {
+		dev_info(&dsi->dev,
+			 "No backlight configured, using internal\n");
+		struct backlight_device *bl = devm_backlight_device_register(
+			&dsi->dev, "rpi-dsi-display", &dsi->dev,
+			rpi_dsi_display, &rpi_dsi_display_bl_ops, NULL);
+		if (IS_ERR(bl)) {
+			dev_err(&dsi->dev,
+				"Failed to register backlight device\n");
+			return PTR_ERR(bl);
+		}
+		bl->props.max_brightness = 255;
+		bl->props.brightness = 128;
+		bl->props.power = BACKLIGHT_POWER_OFF;
+		rpi_dsi_display->panel.backlight = bl;
+	}
 
 	drm_panel_add(&rpi_dsi_display->panel);
 
