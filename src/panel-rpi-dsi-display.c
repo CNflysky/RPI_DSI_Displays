@@ -25,6 +25,7 @@ struct rpi_dsi_display_desc {
 	enum mipi_dsi_pixel_format format;
 	int (*init_sequence)(struct mipi_dsi_device *dsi);
 	const struct power_on_timing *pwr_timing;
+	bool do_sw_reset;
 };
 
 struct rpi_dsi_display {
@@ -141,8 +142,10 @@ static int rpi_dsi_display_prepare(struct drm_panel *panel)
 		msleep(rpi_dsi_display->desc->pwr_timing->after_reset);
 	}
 
-	// mipi_dsi_dcs_soft_reset_multi(&ctx);
-	// msleep(rpi_dsi_display->desc->reset_delay);
+	if (rpi_dsi_display->desc->do_sw_reset) {
+		mipi_dsi_dcs_soft_reset_multi(&ctx);
+		msleep(rpi_dsi_display->desc->pwr_timing->after_reset);
+	}
 
 	if (rpi_dsi_display->desc->init_sequence) {
 		int ret = rpi_dsi_display->desc->init_sequence(
@@ -263,7 +266,7 @@ static const struct drm_display_mode w280bf036i_mode = {
 };
 
 static const struct drm_display_mode tdo_qhd0500d5_mode = {
-	.clock = 30000,
+	.clock = 33113,
 
 	.hdisplay = 540,
 	.hsync_start = 540 + /* HFP */ 10,
@@ -294,7 +297,8 @@ static const struct rpi_dsi_display_desc w280bf036i_desc = {
 		 MIPI_DSI_MODE_LPM,
 	.format = MIPI_DSI_FMT_RGB888,
 	.init_sequence = w280bf036i_init_sequence,
-	.pwr_timing = &w280bf036i_pwr_timing
+	.pwr_timing = &w280bf036i_pwr_timing,
+	.do_sw_reset = true
 };
 
 static const struct power_on_timing tdo_qhd0500d5_pwr_timing = {
@@ -311,7 +315,8 @@ static const struct rpi_dsi_display_desc tdo_qhd0500d5_desc = {
 		 MIPI_DSI_MODE_LPM,
 	.format = MIPI_DSI_FMT_RGB888,
 	.init_sequence = tdo_qhd0500d5_init_sequence,
-	.pwr_timing = &tdo_qhd0500d5_pwr_timing
+	.pwr_timing = &tdo_qhd0500d5_pwr_timing,
+	.do_sw_reset = true
 };
 
 static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi)
