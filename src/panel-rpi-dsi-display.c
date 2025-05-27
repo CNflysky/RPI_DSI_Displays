@@ -265,21 +265,22 @@ static const struct drm_display_mode w280bf036i_mode = {
 	.type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
 };
 
+// panel timing copied from panel-sharp-ls043t1le01.c
 static const struct drm_display_mode tdo_qhd0500d5_mode = {
-	.clock = 33113,
+	.clock = 41496,
 
 	.hdisplay = 540,
-	.hsync_start = 540 + /* HFP */ 10,
-	.hsync_end = 540 + 10 + /* HSync */ 2,
-	.htotal = 540 + 10 + 2 + /* HBP */ 10,
-
+	.hsync_start = 540 + /* HFP */ 48,
+	.hsync_end = 540 + 48 + /* HSync */ 32,
+	.htotal = 540 + 48 + 32 + /* HBP */ 80,
+ 
 	.vdisplay = 960,
-	.vsync_start = 960 + /* VFP */ 10,
-	.vsync_end = 960 + 10 + /* VSync */ 2,
-	.vtotal = 960 + 10 + 2 + /* VBP */ 10,
+	.vsync_start = 960 + /* VFP */ 3,
+	.vsync_end = 960 + 3 + /* VSync */ 10,
+	.vtotal = 960 + 3 + 10 + /* VBP */ 15,
 
-	.width_mm = 43,
-	.height_mm = 57,
+	.width_mm = 65,
+	.height_mm = 116,
 
 	.type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED,
 };
