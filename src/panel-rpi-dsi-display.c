@@ -125,7 +125,7 @@ inline static int tdo_qhd0500d5_init_sequence(struct mipi_dsi_device *dsi)
 	struct mipi_dsi_multi_context ctx = { .dsi = dsi };
 	// enable backlight
 	mipi_dsi_dcs_write_seq_multi(&ctx, MIPI_DCS_WRITE_CONTROL_DISPLAY,
-				     0x24);
+				     0x2C);
 	return ctx.accum_err;
 }
 
@@ -359,17 +359,17 @@ static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi)
 
 	if (!rpi_dsi_display->panel.backlight) {
 		dev_info(&dsi->dev,
-			 "No backlight configured, using internal\n");
+			 "No backlight configured, using DCS backlight\n");
 		struct backlight_device *bl = devm_backlight_device_register(
-			&dsi->dev, "rpi-dsi-display", &dsi->dev,
+			&dsi->dev, "rpi-dsi-display-bl", &dsi->dev,
 			rpi_dsi_display, &rpi_dsi_display_bl_ops, NULL);
 		if (IS_ERR(bl)) {
 			dev_err(&dsi->dev,
-				"Failed to register backlight device\n");
+				"Failed to register DCS backlight device\n");
 			return PTR_ERR(bl);
 		}
-		bl->props.max_brightness = 255;
-		bl->props.brightness = 128;
+		bl->props.max_brightness = 0xFF;
+		bl->props.brightness = 0x80;
 		bl->props.power = BACKLIGHT_POWER_OFF;
 		rpi_dsi_display->panel.backlight = bl;
 	}

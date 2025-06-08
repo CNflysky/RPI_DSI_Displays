@@ -6,7 +6,7 @@
 	fragment@0 {
 		target-path="/";
 		__overlay__ {
-			rpi_dsi_display_backlight:rpi-dsi-display-backlight {
+			rpi_dsi_display_bl:rpi-dsi-display-bl {
 				compatible = "gpio-backlight";
 				gpios = <&gpio 45 0>;
 				default-on;
@@ -37,7 +37,7 @@
 				compatible    = "wlk,w280bf036i";
 				status        = "okay";
 				reg           = <0>;
-				backlight = <&rpi_dsi_display_backlight>;
+				backlight = <&rpi_dsi_display_bl>;
 				rotation = <0>;
 				port {
 					rpi_dsi_port: endpoint {
