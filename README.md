@@ -20,6 +20,12 @@ You must enable `DRM` first in order to use this driver.
 In `Raspberry Pi OS` releases after `2022-1-28`, `DRM` is enabled by default.  
 Old releases of RPiOS may not support `DRM`,so use latest version of RPiOS is recommended.  
 
+# Supported Panel
+| Part Number | Diagonal | Resolution | Interface | Connector | TP | Target | Note |
+| ---- | ---- | --- | --- | --- | --- | -- | --- |
+|W280BF036I| 2.8 Inch| VGA(480x640) | DSI 1 Lane | 24p | None | `w280bf036i` | |
+|TDO-QHD0500D5| 5.3 Inch| QHD(540x960) | DSI 2 Lane | 33p | FT5406 | `tdo-qhd0500d5` | |
+
 # Configuration
 *Note: this tutorial and code only keep compatibility with latest RPiOS. If you are using old RPiOS, you are on your own.  
 Check for kernel headers:
@@ -28,7 +34,7 @@ ls /lib/modules/`uname -r`/build
 ```
 If not, install it:
 ```bash
-sudo apt install linux-headers-rpi-v8 # for arm64，armv7 users install linux-headers-rpi-v7
+sudo apt install linux-headers-rpi-v8 # for arm64，armv7 install linux-headers-rpi-v7, RPi 5 install linux-headers-rpi-2712
 ```
 Install `make` and `dtc`:
 ```bash
@@ -36,19 +42,14 @@ sudo apt install make device-tree-compiler
 ```
 Clone:
 ```bash
-git clone https://github.com/CNflysky/RPI_DSI_Displays
+git clone https://github.com/CNflysky/RPI_DSI_Displays --depth 1
 cd RPI_DSI_Displays/src
 ```
 
-## Targets
-- w280bf036i-pi4
-- w280bf036i-pi5
-- tdo-qhd0500d5-pi4
-- tdo-qhd0500d5-pi5  
-  
+Select target among `Target` column of `Supported Panel` table.  
 e.g. install 2.8 Inch driver for RPi 4:  
 ```bash
-make w280bf036i-pi4
+make w280bf036i
 sudo make install
 ```
 Reboot.
@@ -71,15 +72,26 @@ rpi_dsi_display:rpi-dsi-display@0 {
 }
 ```
 
+# Debug
+Follow these steps：
+```bash
+# check overlay loaded by firmware
+sudo vclog --msg | grep rpidisp
+# does kernel module loaded? 
+lsmod | grep panel_rpi_dsi_display
+dmesg | grep panel_rpi_dsi_display
+# check overlay applyed or not
+sudo find /proc/device-tree/ -name *rpi-dsi-display*
+cat *found node*/status
+# check backlight node
+cat /sys/class/backlight/rpi-dsi-display-bl/brightness
+echo 128 | sudo tee -a /sys/class/backlight/rpi-dsi-display-bl/brightness
+# if problem still exists, submit an issue
+```
+
 # Port your own panel driver
 [Here](https://github.com/CNflysky/RPI_DSI_Drivers/blob/main/docs/how_to_make_your_custom_driver.md)  
 *Translated from my blog,may not 100% accurate.*
-
-# Supported(Or WIP) Panel
-| Part Number | Diagonal | Resolution | Interface | Connector | TP | Note |
-| ---- | ---- | --- | --- | --- | --- | -- |
-|W280BF036I| 2.8 Inch| VGA(480x640) | DSI 1 Lane | 24p | None | |
-|TDO-QHD0500D5| 5.3 Inch| QHD(540x960) | DSI 2 Lane | 33p | FT5406 | |
 
 # Gallery
 ## W280BF036I
