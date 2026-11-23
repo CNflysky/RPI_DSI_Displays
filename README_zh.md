@@ -59,8 +59,7 @@ sudo make install
 您也可以在OSHWHub上查看:[链接](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)  
 
 # 方向
-屏幕方向通过设备树插件的 `rotation` 参数调整，不需要重新编译和安装。编辑 `/boot/firmware/config.txt`，在 `dtoverlay` 行末尾加上 `,rotation=<角度>`：
-
+编辑`/boot/firmware/config.txt`:  
 ```ini
 # 可选值为 0, 90, 180, 270，默认 0
 dtoverlay=vc4-kms-dsi-rpidisp,rotation=90

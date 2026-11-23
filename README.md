@@ -60,7 +60,7 @@ If you want to get adapters，take a look at [`adapters`](./adapters)directory.
 You can view it on OSHWHub too:[Link](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)(Chinese version only)  
 
 # Rotation
-The panel rotation is set by the overlay's `rotation` parameter, no recompile or reinstall needed. Append `,rotation=<angle>` to the `dtoverlay` line in `/boot/firmware/config.txt`:
+Edit `/boot/firmware/config.txt`:
 
 ```ini
 # valid values: 0, 90, 180, 270 (default: 0)
