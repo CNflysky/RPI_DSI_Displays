@@ -59,17 +59,14 @@ sudo make install
 您也可以在OSHWHub上查看:[链接](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)  
 
 # 方向
-如果需要修改屏幕方向，编辑对应的dts:
-```dts
-rpi_dsi_display:rpi-dsi-display@0 {
-				compatible    = <...>;
-				status        = "okay";
-				reg           = <0>;
-				backlight = <&rpi_dsi_display_bl>;
-				rotation = <0>; // 屏幕方向，可选值为0, 90, 180, 270
-                ...
-}
+屏幕方向通过设备树插件的 `rotation` 参数调整，不需要重新编译和安装。编辑 `/boot/firmware/config.txt`，在 `dtoverlay` 行末尾加上 `,rotation=<角度>`：
+
+```ini
+# 可选值为 0, 90, 180, 270，默认 0
+dtoverlay=vc4-kms-dsi-rpidisp,rotation=90
 ```
+
+重启后生效。参数在 dts 的 `__overrides__` 节点里声明；如果要修改默认方向，可以直接改各面板节点里的 `rotation` 属性，再重新 `make` 并 `sudo make install`。
 
 # 调试
 如果屏幕没显示，可以跟随以下几个步骤排除错误：

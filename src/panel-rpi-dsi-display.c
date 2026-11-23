@@ -36,13 +36,12 @@ struct rpi_dsi_display {
 	enum drm_panel_orientation orientation;
 };
 
-inline static struct rpi_dsi_display *
-to_rpi_dsi_display(struct drm_panel *panel)
+static struct rpi_dsi_display *to_rpi_dsi_display(struct drm_panel *panel)
 {
 	return container_of(panel, struct rpi_dsi_display, panel);
 }
 
-inline static int w280bf036i_init_sequence(struct mipi_dsi_device *dsi)
+static int w280bf036i_init_sequence(struct mipi_dsi_device *dsi)
 {
 	struct mipi_dsi_multi_context ctx = { .dsi = dsi };
 	// Command2 BK3 Selection: Enable the BK function of Command2
@@ -120,7 +119,7 @@ inline static int w280bf036i_init_sequence(struct mipi_dsi_device *dsi)
 	return ctx.accum_err;
 }
 
-inline static int tdo_qhd0500d5_init_sequence(struct mipi_dsi_device *dsi)
+static int tdo_qhd0500d5_init_sequence(struct mipi_dsi_device *dsi)
 {
 	struct mipi_dsi_multi_context ctx = { .dsi = dsi };
 	// enable backlight
@@ -150,11 +149,11 @@ static int rpi_dsi_display_prepare(struct drm_panel *panel)
 	if (rpi_dsi_display->desc->init_sequence) {
 		int ret = rpi_dsi_display->desc->init_sequence(
 			rpi_dsi_display->dsi);
-		if (IS_ERR(&ret)) {
+		if (ret) {
 			dev_err(panel->dev,
-				"Failed to send init sequence to panel: %d",
+				"Failed to send init sequence to panel: %d\n",
 				ret);
-			return PTR_ERR(&ret);
+			return ret;
 		}
 	}
 	mipi_dsi_dcs_exit_sleep_mode_multi(&ctx);
@@ -162,7 +161,7 @@ static int rpi_dsi_display_prepare(struct drm_panel *panel)
 	return ctx.accum_err;
 }
 
-inline static int rpi_dsi_display_enable(struct drm_panel *panel)
+static int rpi_dsi_display_enable(struct drm_panel *panel)
 {
 	struct mipi_dsi_multi_context ctx = { .dsi = to_mipi_dsi_device(
 						      panel->dev) };
@@ -170,7 +169,7 @@ inline static int rpi_dsi_display_enable(struct drm_panel *panel)
 	return ctx.accum_err;
 }
 
-inline static int rpi_dsi_display_disable(struct drm_panel *panel)
+static int rpi_dsi_display_disable(struct drm_panel *panel)
 {
 	struct mipi_dsi_multi_context ctx = { .dsi = to_mipi_dsi_device(
 						      panel->dev) };
@@ -183,7 +182,7 @@ static int rpi_dsi_display_unprepare(struct drm_panel *panel)
 	struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
 	struct mipi_dsi_multi_context ctx = { .dsi = rpi_dsi_display->dsi };
 	mipi_dsi_dcs_enter_sleep_mode_multi(&ctx);
-	if (!rpi_dsi_display->reset)
+	if (rpi_dsi_display->reset)
 		gpiod_set_value_cansleep(rpi_dsi_display->reset, 0);
 	return ctx.accum_err;
 }
@@ -213,7 +212,7 @@ static int rpi_dsi_display_get_modes(struct drm_panel *panel,
 	return 1;
 }
 
-inline static enum drm_panel_orientation
+static enum drm_panel_orientation
 rpi_dsi_display_get_orientation(struct drm_panel *panel)
 {
 	struct rpi_dsi_display *rpi_dsi_display = to_rpi_dsi_display(panel);
@@ -232,14 +231,11 @@ static const struct drm_panel_funcs rpi_dsi_display_funcs = {
 static int rpi_dsi_display_set_brightness(struct backlight_device *bl)
 {
 	struct rpi_dsi_display *rpi_dsi_display = bl_get_data(bl);
-	struct mipi_dsi_device *dsi = rpi_dsi_display->dsi;
-	uint8_t brightness = bl->props.brightness;
-	int ret = 0;
-	ret = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
-				 &brightness, sizeof(brightness));
-	if (ret < 0)
-		return ret;
-	return 0;
+	uint8_t brightness = backlight_is_blank(bl) ? 0 : bl->props.brightness;
+	int ret = mipi_dsi_dcs_write(rpi_dsi_display->dsi,
+				     MIPI_DCS_SET_DISPLAY_BRIGHTNESS,
+				     &brightness, sizeof(brightness));
+	return ret < 0 ? ret : 0;
 }
 
 static const struct backlight_ops rpi_dsi_display_bl_ops = {
@@ -273,7 +269,7 @@ static const struct drm_display_mode tdo_qhd0500d5_mode = {
 	.hsync_start = 540 + /* HFP */ 48,
 	.hsync_end = 540 + 48 + /* HSync */ 32,
 	.htotal = 540 + 48 + 32 + /* HBP */ 80,
- 
+
 	.vdisplay = 960,
 	.vsync_start = 960 + /* VFP */ 3,
 	.vsync_end = 960 + 3 + /* VSync */ 10,
@@ -345,7 +341,7 @@ static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi)
 					       &rpi_dsi_display->orientation);
 	if (ret < 0) {
 		dev_warn(&dsi->dev,
-			 "Failed to get orientation, default to normal");
+			 "Failed to get orientation, default to normal\n");
 		rpi_dsi_display->orientation =
 			DRM_MODE_PANEL_ORIENTATION_NORMAL;
 	}
@@ -354,23 +350,31 @@ static int rpi_dsi_display_probe(struct mipi_dsi_device *dsi)
 		       &rpi_dsi_display_funcs, DRM_MODE_CONNECTOR_DSI);
 
 	ret = drm_panel_of_backlight(&rpi_dsi_display->panel);
-	if (IS_ERR(&ret))
+
+	if (ret)
 		return ret;
 
 	if (!rpi_dsi_display->panel.backlight) {
 		dev_info(&dsi->dev,
 			 "No backlight configured, using DCS backlight\n");
+
+		struct backlight_properties props = {
+			.type = BACKLIGHT_RAW,
+			.max_brightness = 0xff,
+			.brightness = 0x80,
+			.power = BACKLIGHT_POWER_OFF,
+		};
+
 		struct backlight_device *bl = devm_backlight_device_register(
 			&dsi->dev, "rpi-dsi-display-bl", &dsi->dev,
-			rpi_dsi_display, &rpi_dsi_display_bl_ops, NULL);
+			rpi_dsi_display, &rpi_dsi_display_bl_ops, &props);
+
 		if (IS_ERR(bl)) {
 			dev_err(&dsi->dev,
 				"Failed to register DCS backlight device\n");
 			return PTR_ERR(bl);
 		}
-		bl->props.max_brightness = 0xFF;
-		bl->props.brightness = 0x80;
-		bl->props.power = BACKLIGHT_POWER_OFF;
+
 		rpi_dsi_display->panel.backlight = bl;
 	}
 
@@ -392,6 +396,13 @@ static void rpi_dsi_display_remove(struct mipi_dsi_device *dsi)
 	drm_panel_remove(&rpi_dsi_display->panel);
 }
 
+static void rpi_dsi_display_bl_disable(struct mipi_dsi_device *dsi)
+{
+	struct rpi_dsi_display *rpi_dsi_display = mipi_dsi_get_drvdata(dsi);
+	if (rpi_dsi_display->panel.backlight)
+		backlight_disable(rpi_dsi_display->panel.backlight);
+}
+
 static const struct of_device_id rpi_dsi_display_ids[] = {
 	{ .compatible = "wlk,w280bf036i", .data = &w280bf036i_desc },
 	{ .compatible = "truly,tdo-qhd0500d5", .data = &tdo_qhd0500d5_desc },
@@ -403,6 +414,7 @@ MODULE_DEVICE_TABLE(of, rpi_dsi_display_ids);
 static struct mipi_dsi_driver rpi_dsi_display = {
     .probe = rpi_dsi_display_probe,
     .remove = rpi_dsi_display_remove,
+    .shutdown = rpi_dsi_display_bl_disable,
     .driver =
         {
             .name = "rpi_dsi_display_driver",

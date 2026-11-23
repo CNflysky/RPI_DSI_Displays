@@ -60,17 +60,14 @@ If you want to get adapters，take a look at [`adapters`](./adapters)directory.
 You can view it on OSHWHub too:[Link](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)(Chinese version only)  
 
 # Rotation
-edit dts files:  
-```dts
-rpi_dsi_display:rpi-dsi-display@0 {
-				compatible    = <...>;
-				status        = "okay";
-				reg           = <0>;
-				backlight = <&rpi_dsi_display_gpio_backlight>;
-				rotation = <0>; // Rotation: [0, 90, 180, 270]
-                ...
-}
+The panel rotation is set by the overlay's `rotation` parameter, no recompile or reinstall needed. Append `,rotation=<angle>` to the `dtoverlay` line in `/boot/firmware/config.txt`:
+
+```ini
+# valid values: 0, 90, 180, 270 (default: 0)
+dtoverlay=vc4-kms-dsi-rpidisp,rotation=90
 ```
+
+Reboot to apply. The parameter is declared in the `__overrides__` node of the dts; to change the default rotation instead, edit the `rotation` property of the panel node and re-run `make` + `sudo make install`.
 
 # Debug
 Follow these steps：

@@ -58,4 +58,8 @@
 			};
 		};
 	};
+
+	__overrides__ {
+		rotation = <&rpi_dsi_display>, "rotation:0";
+	};
 };

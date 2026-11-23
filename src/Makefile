@@ -14,10 +14,9 @@ ifneq ($(MODEL_EXISTS),)
         PI_MODEL := pi4
     else ifeq ($(findstring Pi 5,$(MODEL_FILE_STR)),Pi 5)
         PI_MODEL := pi5
-	else
-		@echo "Failed to detect Pi Model!"
-		@exit 1
-		endif
+    else
+        $(error Failed to detect Pi model: $(MODEL_FILE_STR))
+    endif
 endif
 
 modules:
@@ -29,10 +28,10 @@ clean:
 	rm -rf *.dtbo
 
 w280bf036i: modules
-	dtc -I dts -O dtb -o $(DTBO_NAME).dtbo dts/vc4-kms-dsi-w280bf036i-$(PI_MODEL).dts
+	dtc -@ -H epapr -I dts -O dtb -o $(DTBO_NAME).dtbo dts/vc4-kms-dsi-w280bf036i-$(PI_MODEL).dts
 
 tdo-qhd0500d5: modules
-	dtc -I dts -O dtb -o $(DTBO_NAME).dtbo dts/vc4-kms-dsi-tdo-qhd0500d5-$(PI_MODEL).dts
+	dtc -@ -H epapr -I dts -O dtb -o $(DTBO_NAME).dtbo dts/vc4-kms-dsi-tdo-qhd0500d5-$(PI_MODEL).dts
 
 install: remove
 	install -m 644 -D $(MODULE_NAME) $(MODULE_INSTALL_DIR)
