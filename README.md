@@ -54,12 +54,12 @@ sudo make install
 ```
 Reboot.
 
-To let DKMS rebuild the module on kernel upgrades (`sudo apt install dkms` first):
+To let DKMS manage the driver:  
 ```bash
+sudo apt install dkms
 make w280bf036i
 sudo make dkms_install
 ```
-Reboot.
 
 use `sudo make remove` or `sudo make dkms_remove` to uninstall driver.    
 
@@ -74,7 +74,7 @@ Edit `/boot/firmware/config.txt`:
 dtoverlay=vc4-kms-dsi-rpidisp,rotation=90
 ```
 
-Reboot to apply. The parameter is declared in the `__overrides__` node of the dts; to change the default rotation instead, edit the `rotation` property of the panel node and re-run `make` + `sudo make install`.
+Reboot to apply.  
 
 # Debug
 Follow these steps：

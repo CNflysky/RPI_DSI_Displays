@@ -53,12 +53,12 @@ sudo make install
 ```
 重启。  
 
-如果想用 DKMS 安装（内核升级后自动重新编译，先 `sudo apt install dkms`）：  
+欲使用 DKMS 来管理驱动：  
 ```bash
+sudo apt install dkms
 make w280bf036i
 sudo make dkms_install
 ```
-重启。  
 
 使用`sudo make remove`或`sudo make dkms_remove`来进行卸载。  
 
@@ -72,7 +72,7 @@ sudo make dkms_install
 dtoverlay=vc4-kms-dsi-rpidisp,rotation=90
 ```
 
-重启后生效。参数在 dts 的 `__overrides__` 节点里声明；如果要修改默认方向，可以直接改各面板节点里的 `rotation` 属性，再重新 `make` 并 `sudo make install`。
+重启后生效。
 
 # 调试
 如果屏幕没显示，可以跟随以下几个步骤排除错误：
