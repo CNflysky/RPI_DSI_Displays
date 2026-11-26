@@ -54,7 +54,14 @@ sudo make install
 ```
 Reboot.
 
-use `sudo make remove` to uninstall driver.    
+To let DKMS rebuild the module on kernel upgrades (`sudo apt install dkms` first):
+```bash
+make w280bf036i
+sudo make dkms_install
+```
+Reboot.
+
+use `sudo make remove` or `sudo make dkms_remove` to uninstall driver.    
 
 If you want to get adapters，take a look at [`adapters`](./adapters)directory.   
 You can view it on OSHWHub too:[Link](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)(Chinese version only)  

@@ -53,7 +53,14 @@ sudo make install
 ```
 重启。  
 
-使用`sudo make remove`来进行卸载。  
+如果想用 DKMS 安装（内核升级后自动重新编译，先 `sudo apt install dkms`）：  
+```bash
+make w280bf036i
+sudo make dkms_install
+```
+重启。  
+
+使用`sudo make remove`或`sudo make dkms_remove`来进行卸载。  
 
 如果您需要自己制作转接板，请查看本仓库下的[`adapters`](./adapters)文件夹。  
 您也可以在OSHWHub上查看:[链接](https://oshwhub.com/cnflysky/RaspberryPi-DSI-Display)  
